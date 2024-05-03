@@ -1,0 +1,4 @@
+Application/build
+Radio/AudioCaptureServer/bin
+Radio/AudioCaptureServer/obj
+Radio/Recognizer/venv
