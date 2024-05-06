@@ -63,7 +63,8 @@ class SelectRadioWidgetState extends State<SelectRadioWidget> {
                 );
               }
             },
-          )),
+          )
+      ),
     );
   }
 }
