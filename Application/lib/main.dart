@@ -56,13 +56,11 @@ class MyHomePageState extends State<MyHomePage> {
                 extended: constraints.maxWidth >= 600,
                 destinations: const [
                   NavigationRailDestination(
-                    icon: Icon(Icons.radio),
-                    label: Text('Радио'),
-                  ),
+                      icon: Icon(Icons.radio), label: Text('Радио')),
                   NavigationRailDestination(
-                    icon: Icon(Icons.disc_full),
-                    label: Text('Записи'),
-                  ),
+                      icon: Icon(Icons.disc_full), label: Text('Записи')),
+                  NavigationRailDestination(
+                      icon: Icon(Icons.search), label: Text('Поиск')),
                   NavigationRailDestination(
                       icon: Icon(Icons.music_note), label: Text('Музыка')),
                   NavigationRailDestination(
@@ -100,12 +98,12 @@ class MyHomePageState extends State<MyHomePage> {
         case 1:
           updateMainWidget(AudioPage(parent: this));
           break;
-        case 2:
+        case 3:
           updateMainWidget(const FingerPrintPage());
           break;
-          case 3:
-            updateMainWidget(TranscriptionAnalysisWidget());
-            break;
+        case 4:
+          updateMainWidget(TranscriptionAnalysisWidget());
+          break;
         default:
           updateMainWidget(const RadioPage());
           break;

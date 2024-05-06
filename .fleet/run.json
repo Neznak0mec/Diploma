@@ -1,0 +1,40 @@
+{
+    "configurations": [
+        
+        {
+            "type": "command",
+            "name": "Run App",
+            "program": "$PROJECT_DIR$/Application/build/linux/x64/release/bundle/abiba",
+            "dependsOn": ["Build"],
+        },
+        
+        {
+            "type": "command",
+            "name": "Build",
+            "program": "flutter",
+            "workingDir": "Application/",
+            "args": ["debug","linux"],
+        },
+        
+        {
+            "type": "command",
+            "name": "Server",
+            "program": "",
+            "dependsOn": ["Api","Recognizer"],
+        },
+        
+        {
+            "type": "dotnet",
+            "name": "Api",
+            "projectPath": "Radio/AudioCaptureServer/AudioCaptureServer.csproj",
+            "args": [],
+        },
+        {
+            "type": "python",
+            "name": "Recognizer",
+            "file": "Radio/Recognizer/main.py",
+            "arguments": [],
+        },
+        
+    ],
+}

@@ -4,6 +4,7 @@ import 'package:abiba/UI/DefaultWidgets/ErrPage.dart';
 import 'package:abiba/main.dart';
 import 'package:flutter/material.dart';
 import '../../Api.dart';
+import 'SelectRadioWidget.dart';
 
 class AudioPage extends StatefulWidget {
   final MyHomePageState parent;
@@ -17,7 +18,7 @@ class AudioPage extends StatefulWidget {
 class AudioPageState extends State<AudioPage> {
   SortingParams params = SortingParams();
   Future<List<ShowAudioWidget>>? radiosFuture;
-  String dropdownValue = "all";
+  String? dropdownValue;
   final MyHomePageState parent;
 
   AudioPageState({required this.parent});
@@ -26,6 +27,7 @@ class AudioPageState extends State<AudioPage> {
   void initState() {
     super.initState();
     radiosFuture = getRadiosAsWidgets();
+    dropdownValue ??= "all";
   }
 
   @override
@@ -54,54 +56,7 @@ class AudioPageState extends State<AudioPage> {
                   children: [
                     Row(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: FutureBuilder<List<String>>(
-                                future: getRadios(),
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<List<String>> snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return CircularProgressIndicator();
-                                  } else if (snapshot.hasError) {
-                                    return Text('Error: ${snapshot.error}');
-                                  } else {
-                                    return DropdownButton<String>(
-                                      value: dropdownValue,
-                                      icon: const Icon(Icons.arrow_downward),
-                                      elevation: 16,
-                                      style: const TextStyle(
-                                          color: Colors.deepPurple),
-                                      underline: Container(
-                                        height: 2,
-                                        color: Colors.deepPurpleAccent,
-                                      ),
-                                      onChanged: (String? value) {
-                                        if (value == "all") {
-                                          params.radioName = null;
-                                        } else {
-                                          params.radioName = value;
-                                        }
-                                        setState(() {
-                                          dropdownValue = value!;
-                                        });
-                                        updateGrid();
-                                      },
-                                      items: snapshot.data!
-                                          .map<DropdownMenuItem<String>>(
-                                              (String value) {
-                                        return DropdownMenuItem<String>(
-                                          value: value,
-                                          child: Text(value),
-                                        );
-                                      }).toList(),
-                                    );
-                                  }
-                                },
-                              )),
-                        ),
+                        SelectRadioWidget(parent: this),
                         ElevatedButton(
                           onPressed: () async {
                             final date = await showDatePicker(
@@ -118,7 +73,7 @@ class AudioPageState extends State<AudioPage> {
                               updateGrid();
                             }
                           },
-                          child: Text('Начало записи'),
+                          child: const Text('Начало записи'),
                         ),
                         ElevatedButton(
                           onPressed: () async {
@@ -171,7 +126,9 @@ class AudioPageState extends State<AudioPage> {
   Future<List<String>> getRadios() async {
     var radiosTemp = await Api.getRadioList();
     List<String> radios = ['all'];
-    radiosTemp.map((e) => radios.add(e.name));
+    for (var radio in radiosTemp) {
+      radios.add(radio.name);
+    }
     dropdownValue = radios.first;
     return radios;
   }
