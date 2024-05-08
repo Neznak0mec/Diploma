@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:abiba/DataClasses/Audio.dart';
 import 'package:abiba/DataClasses/Transcription.dart';
+import 'package:global_configuration/global_configuration.dart';
 import 'package:requests/requests.dart';
 import "package:http/http.dart" as http;
 
@@ -10,7 +11,17 @@ import 'DataClasses/Radio.dart';
 
 class Api {
   //load baseUrl from config file
-  static String baseUrl = LoadFromConfigFile();
+  static String baseUrl = GlobalConfiguration().getValue("api_url") as String;
+
+  //check availability of server
+  static Future<bool> checkServer(url) async {
+    try {
+      var r = await Requests.get("$url/radio");
+      return r.success;
+    } catch (e) {
+      return false;
+    }
+  }
 
   ///////////////////////////////
   // Radio

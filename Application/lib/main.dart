@@ -1,10 +1,14 @@
 import 'package:abiba/UI/AudioWidgets/AudioPage.dart';
 import 'package:abiba/UI/FingerPrintWidgets/FingerPrintPage.dart';
 import 'package:flutter/material.dart';
+import 'package:global_configuration/global_configuration.dart';
 import 'UI/Diograms/DiogramWidget.dart';
 import 'UI/RadioWidgets/RadioPage.dart';
+import 'UI/SettigsWidget/Settings.dart';
+import 'AppSettings.config.dart';
 
 void main() {
+  GlobalConfiguration().loadFromMap(appSettings);
   runApp(const MyApp());
 }
 
@@ -65,6 +69,8 @@ class MyHomePageState extends State<MyHomePage> {
                       icon: Icon(Icons.music_note), label: Text('Музыка')),
                   NavigationRailDestination(
                       icon: Icon(Icons.analytics), label: Text('Статистика')),
+                  NavigationRailDestination(
+                      icon: Icon(Icons.settings), label: Text('Настройки')),
                 ],
                 selectedIndex: selectedIndex,
                 onDestinationSelected: (value) {
@@ -103,6 +109,9 @@ class MyHomePageState extends State<MyHomePage> {
           break;
         case 4:
           updateMainWidget(TranscriptionAnalysisWidget());
+          break;
+        case 5:
+          updateMainWidget(SettingsPage(parent: this));
           break;
         default:
           updateMainWidget(const RadioPage());

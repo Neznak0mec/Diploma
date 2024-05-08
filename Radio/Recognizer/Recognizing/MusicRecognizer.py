@@ -39,7 +39,10 @@ class LocalMusicRecognizer:
         if use_network and song['results'] == [] and not all_results:
             while (True):
                 try:
-                    return await NetworkMusicRecognizer().recognize(segment)
+                    result = await NetworkMusicRecognizer().recognize(segment)
+                    if result != "Not Found":
+                        return result + "(Online)"
+                    return result
                 except:
                     await asyncio.sleep(10)
                     continue

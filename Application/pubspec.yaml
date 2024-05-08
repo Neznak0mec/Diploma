@@ -25,6 +25,7 @@ dependencies:
   fl_chart: ^0.66.2
   syncfusion_flutter_charts: ^24.2.9
   excel: ^4.0.2
+  global_configuration: ^2.0.0-nullsafety.1
 
 dev_dependencies:
   flutter_test:
