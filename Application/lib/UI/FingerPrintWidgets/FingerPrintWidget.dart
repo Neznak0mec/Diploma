@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 class FingerPrintWidget extends StatefulWidget {
   final MyAudio audio;
 
-  const FingerPrintWidget(this.audio, {Key? key}) : super(key: key);
+  const FingerPrintWidget(this.audio, {super.key});
 
   @override
   _FingerPrintWidgetState createState() => _FingerPrintWidgetState();
@@ -44,11 +44,11 @@ class _FingerPrintWidgetState extends State<FingerPrintWidget> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IconButton(
-                icon: Icon(Icons.play_arrow),
+                icon: const Icon(Icons.play_arrow),
                 onPressed: playAudio,
               ),
               IconButton(
-                icon: Icon(Icons.pause),
+                icon: const Icon(Icons.pause),
                 onPressed: pauseAudio,
               ),
             ],

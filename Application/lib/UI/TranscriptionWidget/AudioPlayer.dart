@@ -10,7 +10,7 @@ import 'package:path_provider/path_provider.dart';
 class AudioPlayerPage extends StatefulWidget {
   final String audioUrl;
 
-  AudioPlayerPage({super.key, required this.audioUrl});
+  const AudioPlayerPage({super.key, required this.audioUrl});
 
   @override
   _AudioPlayerPageState createState() => _AudioPlayerPageState();
@@ -18,11 +18,11 @@ class AudioPlayerPage extends StatefulWidget {
 
 class _AudioPlayerPageState extends State<AudioPlayerPage> {
   late AudioPlayer audioPlayer;
-  Duration _duration = Duration();
-  Duration _position = Duration();
+  Duration _duration = const Duration();
+  Duration _position = const Duration();
   bool isPlaying = false;
   bool isLoading = false;
-  String? localFilePath = null;
+  String? localFilePath;
   Timer? _debounce;
 
   @override

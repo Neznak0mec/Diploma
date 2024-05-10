@@ -1,14 +1,13 @@
 import 'package:abiba/UI/AudioWidgets/AudioPage.dart';
 import 'package:abiba/UI/FingerPrintWidgets/FingerPrintPage.dart';
 import 'package:flutter/material.dart';
-import 'package:global_configuration/global_configuration.dart';
+import 'Settings.dart';
 import 'UI/Diograms/DiogramWidget.dart';
 import 'UI/RadioWidgets/RadioPage.dart';
 import 'UI/SettigsWidget/Settings.dart';
-import 'AppSettings.config.dart';
 
 void main() {
-  GlobalConfiguration().loadFromMap(appSettings);
+  SettingsService().init();
   runApp(const MyApp());
 }
 
@@ -108,7 +107,7 @@ class MyHomePageState extends State<MyHomePage> {
           updateMainWidget(const FingerPrintPage());
           break;
         case 4:
-          updateMainWidget(TranscriptionAnalysisWidget());
+          updateMainWidget(const TranscriptionAnalysisWidget());
           break;
         case 5:
           updateMainWidget(SettingsPage(parent: this));

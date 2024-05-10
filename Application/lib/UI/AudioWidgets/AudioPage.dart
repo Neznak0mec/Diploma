@@ -9,7 +9,7 @@ import 'SelectRadioWidget.dart';
 class AudioPage extends StatefulWidget {
   final MyHomePageState parent;
 
-  AudioPage({required this.parent, Key? key}) : super(key: key);
+  const AudioPage({required this.parent, super.key});
 
   @override
   AudioPageState createState() => AudioPageState(parent: parent);
@@ -91,7 +91,7 @@ class AudioPageState extends State<AudioPage> {
                               updateGrid();
                             }
                           },
-                          child: Text('Конец записи'),
+                          child: const Text('Конец записи'),
                         ),
                       ],
                     ),

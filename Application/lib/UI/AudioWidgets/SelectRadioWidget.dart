@@ -1,14 +1,13 @@
 
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import 'AudioPage.dart';
 
 class SelectRadioWidget extends StatefulWidget {
   final AudioPageState parent;
 
-  SelectRadioWidget({required this.parent, Key? key}) : super(key: key);
+  const SelectRadioWidget({required this.parent, super.key});
 
   @override
   SelectRadioWidgetState createState() => SelectRadioWidgetState(parent: parent);

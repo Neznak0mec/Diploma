@@ -57,27 +57,25 @@ class AudioTranscriptionWidget extends StatelessWidget {
   }
 
   Widget _buildTimingText() {
-
     List<Column> segments = [];
-    for (var segment in transcription.segments){
-
-
+    for (var segment in transcription.segments) {
       List<ListTile> subSegments = [];
-      for (var sub in segment.textSegments){
-        subSegments.add(
-            ListTile(
-              title: Text(sub.text),
-              subtitle: Text(
-                  'Начало: ${((sub.start ?? 0) / 60).floor() }:${(sub.start ?? 0) % 60}, Конец: ${((sub.end ?? 0) / 60).floor()}:${(sub.end ?? 0) % 60}'),
-            )
-        );
+      for (var sub in segment.textSegments) {
+        subSegments.add(ListTile(
+          title: Text(sub.text),
+          subtitle: Text(
+              'Начало: ${((sub.start ?? 0) / 60).floor()}:${(sub.start ?? 0) % 60}, Конец: ${((sub.end ?? 0) / 60).floor()}:${(sub.end ?? 0) % 60}'),
+        ));
       }
 
       segments.add(Column(
         children: [
-          Text( segment.trackName == "Not Found"
-              ? "Трек не найден"
-              : segment.trackName, textScaler: const TextScaler.linear(2),),
+          Text(
+            segment.trackName == "Not Found"
+                ? "Трек не найден"
+                : segment.trackName,
+            textScaler: const TextScaler.linear(2),
+          ),
           ...subSegments
         ],
       ));
@@ -112,10 +110,13 @@ class AudioTranscriptionWidget extends StatelessWidget {
         ),
         ...List.generate(events.length, (index) {
           final item = events[index];
+
+          var timeText =
+              "Начало: ${((item.start ?? 0) / 60).floor()}:${(item.start ?? 0) % 60}, Конец: ${((item.end ?? 0) / 60).floor()}:${(item.end ?? 0) % 60}";
+
           return ListTile(
             title: Text(item.name!),
-            subtitle: Text(
-                'Начало: ${(item.start ?? 0 / 60).floor()}:${item.start ?? 0 % 60}, Конец: ${(item.end ?? 0 / 60).floor()}:${item.end ?? 0 % 60}'),
+            subtitle: Text(timeText),
           );
         }),
       ],

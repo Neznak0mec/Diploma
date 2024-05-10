@@ -3,14 +3,14 @@
 // use checkbox to save in configuration file if the user wants to see audio founed in internet
 
 import 'package:flutter/material.dart';
-import 'package:global_configuration/global_configuration.dart';
 import '../../Api.dart';
+import '../../Settings.dart';
 import '../../main.dart';
 
 class SettingsPage extends StatefulWidget {
   final MyHomePageState parent;
 
-  SettingsPage({required this.parent, Key? key}) : super(key: key);
+  const SettingsPage({required this.parent, super.key});
 
   @override
   RadioPageState createState() => RadioPageState(parent: parent);
@@ -26,19 +26,10 @@ class RadioPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
-    if (GlobalConfiguration().getValue("api_url") == null) {
-      GlobalConfiguration().add({
-        "api_url": "",
-      });
-    }
-    if (GlobalConfiguration().getValue("internet_audio") == null) {
-      GlobalConfiguration().add({
-        "internet_audio": true,
-      });
-    }
 
-    _controller.text = GlobalConfiguration().getValue("api_url") as String;
-    _internetAudio = GlobalConfiguration().getValue("internet_audio") as bool;
+
+    _controller.text = SettingsService.API_URL;
+    _internetAudio = SettingsService.INTERNET_AUDIO;
   }
 
   @override
@@ -66,7 +57,7 @@ class RadioPageState extends State<SettingsPage> {
                     //check if the url is valid with uising ping
                     if (await Api.checkServer(_controller.text)) {
                       //save the url in configuration file
-                      GlobalConfiguration().updateValue("api_url", _controller.text);
+                      SettingsService.setApiUrl(_controller.text);
                       Api.baseUrl = _controller.text;
                     } else {
                       //show error message
@@ -101,7 +92,7 @@ class RadioPageState extends State<SettingsPage> {
                     setState(() {
                       _internetAudio = value!;
                     });
-                    GlobalConfiguration().updateValue("internet_audio", value);
+                    SettingsService.setInternetAudio(value!);
                   },
                 ),
                 const Text("Показывать аудио из интернета"),

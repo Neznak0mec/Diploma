@@ -8,7 +8,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:excel/excel.dart';
 
 class TranscriptionAnalysisWidget extends StatefulWidget {
-  TranscriptionAnalysisWidget({Key? key}) : super(key: key);
+  const TranscriptionAnalysisWidget({super.key});
 
   @override
   _TranscriptionAnalysisWidgetState createState() => _TranscriptionAnalysisWidgetState();
@@ -25,14 +25,13 @@ class _TranscriptionAnalysisWidgetState extends State<TranscriptionAnalysisWidge
 
   Future<void> getTranscriptions() async {
     transcriptions = await Api.getAllTranscriptions();
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Transcription Analysis'),
+        title: const Text('Transcription Analysis'),
       ),
       body: Column(
         children: [
@@ -79,7 +78,7 @@ class _TranscriptionAnalysisWidgetState extends State<TranscriptionAnalysisWidge
             ),
           ),
           ElevatedButton(
-            child: Text('Создать отчет'),
+            child: const Text('Создать отчет'),
             onPressed: () {
               createExcelReport(getMusicData(), getTracksCount(transcriptions), TotalSegmentsOfRadiostation(transcriptions));
             },
