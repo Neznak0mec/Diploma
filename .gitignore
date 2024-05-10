@@ -1,5 +1,7 @@
 Application/build
+Application/linux/build
 Radio/AudioCaptureServer/bin
 Radio/AudioCaptureServer/obj
 Radio/Recognizer/venv
+Radio/Recognizer/.venv
 __pycache__/
