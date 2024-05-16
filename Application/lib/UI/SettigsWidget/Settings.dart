@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../Api.dart';
 import '../../Settings.dart';
 import '../../main.dart';
+import '../SnackBars/FlashMessageSuccess.dart';
 
 class SettingsPage extends StatefulWidget {
   final MyHomePageState parent;
@@ -58,6 +59,8 @@ class RadioPageState extends State<SettingsPage> {
                       //save the url in configuration file
                       SettingsService.setApiUrl(_controller.text);
                       Api.baseUrl = _controller.text;
+                      var snackBar = FlashMessageSuccess("Сервер установлен", context);
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     } else {
                       //show error message
                       showDialog(
@@ -156,6 +159,8 @@ class RadioRecordPageState extends State<RadioRecordWidget> {
           ElevatedButton(
             onPressed: () async {
               await Api.stopAllRecordings();
+              var snackBar = FlashMessageSuccess("Все радиостанции будут остановлены при завершении записи последнего сегмента", context);
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
               _updateRadioRecording();
             },
             child: const Text("Остановить все"),
@@ -163,6 +168,8 @@ class RadioRecordPageState extends State<RadioRecordWidget> {
           ElevatedButton(
             onPressed: () async {
               await Api.startAllRecordings();
+              var snackBar = FlashMessageSuccess("Все радиостанции будут остановлены при завершении записи последнего сегмента", context);
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
               _updateRadioRecording();
             },
             child: const Text("Запустить все"),
@@ -174,28 +181,6 @@ class RadioRecordPageState extends State<RadioRecordWidget> {
   }
 }
 
-//wideget to split radio recording
-//create like this
-//for (var i in _radioRecording.keys)
-//           Row(
-//
-//             children: [
-//               Checkbox(
-//                 value: _radioRecording[i],
-//                 onChanged: (bool? value) async {
-//                   if (value!) {
-//                     await Api.startRecording(i);
-//                   } else {
-//                     await Api.stopRecording(i);
-//                   }
-//                   _updateRadioRecording();
-//                 },
-//               ),
-//               Text(i),
-//             ],
-//           ),
-//split all into 2 columns
-//use column to split all into 2 columns
 
 class RadioRecordingCheckboxes extends StatefulWidget {
   final MyHomePageState parent;
@@ -238,11 +223,15 @@ class RadioRecordingCheckboxesState extends State<RadioRecordingCheckboxes> {
               Checkbox(
                 value: _radioRecording[i],
                 onChanged: (bool? value) async {
+                  var snackBar;
                   if (value!) {
                     await Api.startRecording(i);
+                    snackBar = FlashMessageSuccess("Запись $i начата", context);
                   } else {
+                    snackBar = FlashMessageSuccess("Запись $i будет остановлена при завершении записи последнего сегмента", context);
                     await Api.stopRecording(i);
                   }
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   _updateRadioRecording();
                 },
               ),
@@ -257,11 +246,15 @@ class RadioRecordingCheckboxesState extends State<RadioRecordingCheckboxes> {
               Checkbox(
                 value: _radioRecording[i],
                 onChanged: (bool? value) async {
+                  var snackBar;
                   if (value!) {
+                    snackBar = FlashMessageSuccess("Запись $i начата", context);
                     await Api.startRecording(i);
                   } else {
+                    snackBar = FlashMessageSuccess("Запись $i будет остановлена при завершении записи последнего сегмента", context);
                     await Api.stopRecording(i);
                   }
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   _updateRadioRecording();
                 },
               ),

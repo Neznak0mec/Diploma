@@ -39,7 +39,7 @@ class ShowRadioWidget extends RadioWidget {
                 GestureDetector(
                   onTap: () {
                     Clipboard.setData(ClipboardData(text: radio.url));
-                    ScaffoldMessenger.of(context).showSnackBar( FlashMessageSucess("URL успешно скопировано в буффер обмена",context,time: 10 ));
+                    ScaffoldMessenger.of(context).showSnackBar( FlashMessageSuccess("URL успешно скопировано в буффер обмена",context,time: 10 ));
                   },
                   child: Text(
                     radio.ShortUrl(),

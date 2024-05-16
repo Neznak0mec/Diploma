@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 
-class FlashMessageSucess extends SnackBar {
+class FlashMessageSuccess extends SnackBar {
   final String message;
   final int time;
-
   final BuildContext context;
 
-  const FlashMessageSucess(this.message, this.context,
-      {super.key, this.time = 10, super.content = const Text('')});
+  const FlashMessageSuccess(
+      this.message,
+      this.context, {
+        Key? key,
+        this.time = 10,
+      }) : super(
+    key: key,
+    content: const Text(''),
+  );
 
   @override
   Widget get content => Container(
@@ -23,18 +29,23 @@ class FlashMessageSucess extends SnackBar {
           children: [
             const Align(
               alignment: Alignment.topLeft,
-              child: Text("Успешно",
-                  style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black)),
+              child: Text(
+                "Успешно",
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
             ),
             Align(
               alignment: Alignment.topLeft,
               child: Text(
                 message,
-                style:
-                const TextStyle(fontSize: 14.0, color: Colors.black54),
+                style: const TextStyle(
+                  fontSize: 14.0,
+                  color: Colors.black54,
+                ),
                 overflow: TextOverflow.ellipsis,
               ),
             )
@@ -45,7 +56,7 @@ class FlashMessageSucess extends SnackBar {
           right: 0,
           child: IconButton(
             onPressed: () {
-              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
             },
             icon: const Icon(
               Icons.close,
@@ -58,19 +69,14 @@ class FlashMessageSucess extends SnackBar {
   );
 
   @override
-  // TODO: implement behavior
   SnackBarBehavior? get behavior => SnackBarBehavior.floating;
 
   @override
-  // TODO: implement backgroundColor
   Color? get backgroundColor => Colors.transparent;
 
   @override
-  // TODO: implement elevation
   double? get elevation => 0;
 
   @override
-  // TODO: implement duration
   Duration get duration => Duration(seconds: time);
-
 }

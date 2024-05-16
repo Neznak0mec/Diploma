@@ -55,17 +55,11 @@ class MyHomePageState extends State<MyHomePage> {
       return Scaffold(
         body: Row(
           children: [
-            IconButton(
-                onPressed: () => {
-                      setState(() {
-                        extended = !extended;
-                      })
-                    },
-                icon: const Icon(Icons.density_medium_outlined)),
             SafeArea(
               child: NavigationRail(
                 extended: constraints.maxWidth >= 600 && extended,
                 destinations: const [
+
                   NavigationRailDestination(
                       icon: Icon(Icons.radio), label: Text('Радио')),
                   NavigationRailDestination(
@@ -78,20 +72,28 @@ class MyHomePageState extends State<MyHomePage> {
                       icon: Icon(Icons.analytics), label: Text('Статистика')),
                   NavigationRailDestination(
                       icon: Icon(Icons.settings), label: Text('Настройки')),
+                  NavigationRailDestination(
+                      icon: Icon(Icons.density_medium_outlined), label: Text('Свернуть')),
                 ],
                 selectedIndex: selectedIndex,
                 onDestinationSelected: (value) {
-                  setState(() {
-                    selectedIndex = value;
-                    updatePage(null);
-                  });
+                  if (value == 6) {
+                    setState(() {
+                      extended = !extended;
+                    });
+                  } else {
+                    setState(() {
+                      selectedIndex = value;
+                      updatePage(null);
+                    });
+                  }
                 },
               ),
             ),
             Expanded(
               child: Container(
                 color: Theme.of(context).colorScheme.primaryContainer,
-                child: page,
+                child: SafeArea(child: page!) ,
               ),
             ),
           ],
@@ -111,11 +113,14 @@ class MyHomePageState extends State<MyHomePage> {
         case 1:
           updateMainWidget(AudioPage(parent: this));
           break;
-        case 3:
+        case 2:
           updateMainWidget(const FingerPrintPage());
           break;
-        case 4:
+        case 3:
           updateMainWidget(const TranscriptionAnalysisWidget());
+          break;
+        case 4:
+          updateMainWidget(const FingerPrintPage());
           break;
         case 5:
           updateMainWidget(SettingsPage(parent: this));

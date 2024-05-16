@@ -1,12 +1,15 @@
 import 'package:abiba/Api.dart';
+import 'package:abiba/DataClasses/Radio.dart';
 import 'package:abiba/UI/FingerPrintWidgets/FingerPrintPage.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-//finger print widget. Contains 2 inputs for name and file picker for audio file. Then with using api send file to server
+import '../SnackBars/FlashMessageError.dart';
+
 class AddFingerPrintWidget extends StatefulWidget {
-  const AddFingerPrintWidget({super.key, required this.parent});
+  const AddFingerPrintWidget({Key? key, required this.parent}) : super(key: key);
 
   final FingerPrintState parent;
 
@@ -19,6 +22,7 @@ class _AddFingerPrintWidgetState extends State<AddFingerPrintWidget> {
   final AudioPlayer audioPlayer = AudioPlayer();
   String? _filePath;
   String? _fileName;
+  List<MyRadio> _radioList = [];
 
   bool isJingle = false;
   String? selectedRadio;
@@ -26,6 +30,20 @@ class _AddFingerPrintWidgetState extends State<AddFingerPrintWidget> {
   final FingerPrintState parent;
 
   _AddFingerPrintWidgetState({required this.parent});
+
+  @override
+  void initState() {
+    super.initState();
+    loadRadioList();
+  }
+
+  Future<void> loadRadioList() async {
+    // Load radio list asynchronously here
+    List<MyRadio> radioList = await Api.getRadioList();
+    setState(() {
+      _radioList = radioList;
+    });
+  }
 
   void playAudio() async {
     if (_filePath != null) {
@@ -52,8 +70,9 @@ class _AddFingerPrintWidgetState extends State<AddFingerPrintWidget> {
   void sendFile() async {
     if (_fileName != null) {
       var res = await Api.sendAudioToServer(_nameController.text, _filePath!);
-      if (res != 200){
-        //todo err message
+      if (res != 200) {
+        var bar = FlashMessageError("Ошибка при отправке файла", context);
+        ScaffoldMessenger.of(context).showSnackBar(bar);
         return;
       }
       parent.updateGrid();
@@ -80,36 +99,38 @@ class _AddFingerPrintWidgetState extends State<AddFingerPrintWidget> {
               labelText: "Имя",
             ),
           ),
-          // checkbox is audio is jingle, if enable add select to select radio station
-          CheckboxListTile(
-            title: const Text('Джинл?'),
-            value: isJingle,
-            onChanged: (bool? value) {
-              setState(() {
-                isJingle = value!;
-              });
-            },
-          ),
-          Row(children: [
-            if (isJingle) // Dropdown is only visible when the checkbox is checked
-              DropdownButton<String>(
-                value: selectedRadio,
-                hint: const Text('Радиостанция'),
-                items: <String>['Radio1', 'Radio2', 'Radio3', 'Radio4']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
+          Row(
+            children: [
+              Checkbox(
+                value: isJingle,
+                onChanged: (bool? value) {
                   setState(() {
-                    selectedRadio = newValue;
+                    isJingle = value!;
                   });
                 },
               ),
-          ],),
-
+              const Text('Джинл'),
+              const Spacer(), // Spacer to push DropdownButton to the right
+              if (isJingle) // Dropdown is only visible when the checkbox is checked
+                DropdownButton<String>(
+                  value: selectedRadio,
+                  hint: const Text('Радиостанция'),
+                  items: _radioList.map<DropdownMenuItem<String>>(
+                        (MyRadio value) {
+                      return DropdownMenuItem<String>(
+                        value: value.name,
+                        child: Text(value.name),
+                      );
+                    },
+                  ).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedRadio = newValue;
+                    });
+                  },
+                ),
+            ],
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
