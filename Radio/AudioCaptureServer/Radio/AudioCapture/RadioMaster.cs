@@ -6,14 +6,17 @@ namespace AudioCaptureServer.AudioCapture;
 public class RadioMaster
 {
     private List<Radio> _radios;
-    private  DataBase.MyDataBase _myDataBase;
-    
+    private DataBase.MyDataBase _myDataBase;
+
+    private Dictionary<string, RadioCapture> _radioCaptures;
+
     public RadioMaster(DataBase.MyDataBase myDataBase)
     {
         Log.Information("RadioMaster created");
 
         _radios = new List<Radio>();
-        this._myDataBase = myDataBase;
+        _radioCaptures = new Dictionary<string, RadioCapture>();
+        _myDataBase = myDataBase;
         LoadRadios();
     }
 
@@ -24,7 +27,7 @@ public class RadioMaster
         Log.Information("RadioMaster started recording audio");
     }
 
-    
+
     private void LoadRadios()
     {
         _radios = _myDataBase.radioCollection.GetAll();
@@ -44,9 +47,61 @@ public class RadioMaster
         StartRadioCapture(radio);
         Log.Information("Recording {RadioRadioName} started", radio.name);
     }
-    
-    private void StartRadioCapture(Radio radio) => _ = Task.Run(async () =>
+
+    private void StartRadioCapture(Radio radio)
     {
-         await new RadioCapture(radio, _myDataBase).StartCapture();
-    });
+        var radioCapture = new RadioCapture(radio, _myDataBase);
+        _ = radioCapture.StartCapture();
+        _radioCaptures[radio.name] = radioCapture;
+    }
+
+    public void PauseRadioCapture(string? radioName = null)
+    {
+        if (radioName == null)
+        {
+            foreach (var radioCapture in _radioCaptures)
+            {
+                radioCapture.Value.PauseCapture();
+            }
+        }
+        else
+        {
+            if (_radioCaptures.ContainsKey(radioName))
+            {
+                _radioCaptures[radioName].PauseCapture();
+            }
+        }
+    }
+    
+    
+    public void ResumeRadioCapture(string? radioName = null)
+    {
+        if (radioName == null)
+        {
+            foreach (var radioCapture in _radioCaptures)
+            {
+                radioCapture.Value.ContinueCapture();
+            }
+        }
+        else
+        {
+            if (_radioCaptures.ContainsKey(radioName))
+            {
+                _radioCaptures[radioName].ContinueCapture();
+            }
+        }
+    }
+    
+    //get recording status
+    public Dictionary<string, bool> GetStatus()
+    {
+        Dictionary<string, bool> status = new Dictionary<string, bool>();
+        foreach (var radioCapture in _radioCaptures)
+        {
+            status[radioCapture.Key] = radioCapture.Value.IsRecording();
+        }
+
+        return status;
+    }
+    
 }

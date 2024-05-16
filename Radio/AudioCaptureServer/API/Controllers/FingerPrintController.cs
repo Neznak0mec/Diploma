@@ -38,14 +38,24 @@ public class FingerPrintController : ControllerBase {
     }
     
     [HttpPost]
-    public async Task<ActionResult> PostFile(IFormFile file,string name,[FromServices] DataBase.MyDataBase myDataBase)
+    public async Task<ActionResult> PostFile([FromServices] DataBase.MyDataBase myDataBase,IFormFile file,string name,string? jingle = null,string? radioName = null)
     {
         try
         {
             await WriteFile(file);
+            Audio task;
+            if (jingle == "true")
+            {
+                name += "<jingle>";
+                task = new Audio(radioName,name,"FingerPrint",
+                    DateTime.Now,DateTime.Now,20);
+            }
+            else
+            {
+                task = new Audio(null,name,"FingerPrint",
+                    DateTime.Now,DateTime.Now,10);
+            }
 
-            Audio task = new(null,file.FileName,"FingerPrint",
-                DateTime.Now,DateTime.Now,10);
             myDataBase.audioCollection.Insert(task);
             
             return Ok();

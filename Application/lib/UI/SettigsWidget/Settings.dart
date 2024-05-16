@@ -27,7 +27,6 @@ class RadioPageState extends State<SettingsPage> {
   void initState() {
     super.initState();
 
-
     _controller.text = SettingsService.API_URL;
     _internetAudio = SettingsService.INTERNET_AUDIO;
   }
@@ -84,6 +83,10 @@ class RadioPageState extends State<SettingsPage> {
                 ),
               ],
             ),
+            const Divider(
+              height: 5,
+              color: Colors.black,
+            ),
             Row(
               children: [
                 Checkbox(
@@ -98,12 +101,192 @@ class RadioPageState extends State<SettingsPage> {
                 const Text("Показывать аудио из интернета"),
               ],
             ),
+            const Divider(
+              height: 5,
+              color: Colors.black,
+            ),
+            Row(
+              children: [
+                RadioRecordWidget(parent: parent),
+              ],
+            )
           ],
         ),
       ),
     );
   }
-
 }
 
+class RadioRecordWidget extends StatefulWidget {
+  final MyHomePageState parent;
 
+  const RadioRecordWidget({required this.parent, super.key});
+
+  @override
+  RadioRecordPageState createState() => RadioRecordPageState(parent: parent);
+}
+
+class RadioRecordPageState extends State<RadioRecordWidget> {
+  final MyHomePageState parent;
+  Map<String, bool> _radioRecording = {};
+
+  RadioRecordPageState({required this.parent});
+
+  @override
+  void initState() {
+    super.initState();
+    _updateRadioRecording();
+  }
+
+  void _updateRadioRecording() async {
+    var res = await Api.radioRecordingStats();
+    setState(() {
+      _radioRecording = res;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(children: [
+          Text("Сейчас записывается ${_radioRecording.length} радиостанций")
+        ]),
+        Row(children: [
+          ElevatedButton(
+            onPressed: () async {
+              await Api.stopAllRecordings();
+              _updateRadioRecording();
+            },
+            child: const Text("Остановить все"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              await Api.startAllRecordings();
+              _updateRadioRecording();
+            },
+            child: const Text("Запустить все"),
+          )
+        ]),
+        RadioRecordingCheckboxes(parent: parent),
+      ],
+    );
+  }
+}
+
+//wideget to split radio recording
+//create like this
+//for (var i in _radioRecording.keys)
+//           Row(
+//
+//             children: [
+//               Checkbox(
+//                 value: _radioRecording[i],
+//                 onChanged: (bool? value) async {
+//                   if (value!) {
+//                     await Api.startRecording(i);
+//                   } else {
+//                     await Api.stopRecording(i);
+//                   }
+//                   _updateRadioRecording();
+//                 },
+//               ),
+//               Text(i),
+//             ],
+//           ),
+//split all into 2 columns
+//use column to split all into 2 columns
+
+class RadioRecordingCheckboxes extends StatefulWidget {
+  final MyHomePageState parent;
+
+  const RadioRecordingCheckboxes({required this.parent, super.key});
+
+  @override
+  RadioRecordingCheckboxesState createState() =>
+      RadioRecordingCheckboxesState(parent: parent);
+}
+
+class RadioRecordingCheckboxesState extends State<RadioRecordingCheckboxes> {
+  final MyHomePageState parent;
+  Map<String, bool> _radioRecording = {};
+
+  RadioRecordingCheckboxesState({required this.parent});
+
+  @override
+  void initState() {
+    super.initState();
+    _updateRadioRecording();
+  }
+
+  void _updateRadioRecording() async {
+    var res = await Api.radioRecordingStats();
+    setState(() {
+      _radioRecording = res;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var leftColumn = <Widget>[];
+    var rightColumn = <Widget>[];
+    for (var i in _radioRecording.keys) {
+      if (_radioRecording.keys.toList().indexOf(i) % 2 == 0) {
+        leftColumn.add(
+          Row(
+            children: [
+              Checkbox(
+                value: _radioRecording[i],
+                onChanged: (bool? value) async {
+                  if (value!) {
+                    await Api.startRecording(i);
+                  } else {
+                    await Api.stopRecording(i);
+                  }
+                  _updateRadioRecording();
+                },
+              ),
+              Text(i),
+            ],
+          ),
+        );
+      } else {
+        rightColumn.add(
+          Row(
+            children: [
+              Checkbox(
+                value: _radioRecording[i],
+                onChanged: (bool? value) async {
+                  if (value!) {
+                    await Api.startRecording(i);
+                  } else {
+                    await Api.stopRecording(i);
+                  }
+                  _updateRadioRecording();
+                },
+              ),
+              Text(i),
+            ],
+          ),
+        );
+      }
+    }
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Column(
+              children: leftColumn,
+            ),
+
+            Column(
+              children: rightColumn,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}

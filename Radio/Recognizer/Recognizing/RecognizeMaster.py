@@ -122,7 +122,7 @@ class RecognizeMaster:
                     else:
                         segments.append(radio_segment)
 
-                jingles += (self.finder.find_jangles(radio_segment.text_segments))
+                jingles += (self.finder.find_jangles(radio_segment.text_segments, task.radio_name))
                 news += self.finder.find_news_segments(radio_segment.text_segments)
 
                 current_time += segment_duration

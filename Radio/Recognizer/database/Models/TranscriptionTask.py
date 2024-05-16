@@ -9,6 +9,9 @@ class TranscriptionTaskStatus(Enum):
     queued_for_fingerprint = 10
     fingerprinted = 11
 
+    queued_for_fingerprint_jingle = 20
+    fingerprinted_jingle = 21
+
 
 class Audio:
 

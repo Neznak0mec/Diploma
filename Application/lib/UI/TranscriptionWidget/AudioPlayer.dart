@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:abiba/UI/SnackBars/FlashMessageError.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -117,13 +118,10 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Аудио плеер'),
-      ),
       body: Center(
         child: isLoading
             ? const CircularProgressIndicator()
-            : Column(
+            : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [

@@ -36,6 +36,7 @@ class MyHomePage extends StatefulWidget {
 
 class MyHomePageState extends State<MyHomePage> {
   var selectedIndex = 0;
+  var extended = true;
   Widget? page;
 
   void updateMainWidget(Widget newWidget) {
@@ -54,9 +55,16 @@ class MyHomePageState extends State<MyHomePage> {
       return Scaffold(
         body: Row(
           children: [
+            IconButton(
+                onPressed: () => {
+                      setState(() {
+                        extended = !extended;
+                      })
+                    },
+                icon: const Icon(Icons.density_medium_outlined)),
             SafeArea(
               child: NavigationRail(
-                extended: constraints.maxWidth >= 600,
+                extended: constraints.maxWidth >= 600 && extended,
                 destinations: const [
                   NavigationRailDestination(
                       icon: Icon(Icons.radio), label: Text('Радио')),

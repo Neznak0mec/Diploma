@@ -28,7 +28,7 @@ class AudioTranscriptionWidget extends StatelessWidget {
                     child: _buildTimingText(),
                   ),
                 ),
-                const VerticalDivider(color: Colors.grey),
+                const VerticalDivider(color: Colors.black,width: 5,),
                 // Серая линия для разделения зон
                 Expanded(
                   flex: 2,
@@ -40,8 +40,9 @@ class AudioTranscriptionWidget extends StatelessWidget {
               ],
             ),
           ),
+          const Divider(color: Colors.black,height: 5),
           Expanded(
-            flex: 3,
+            flex: 1,
             child: _buildAudioPlayer(),
           ),
         ],

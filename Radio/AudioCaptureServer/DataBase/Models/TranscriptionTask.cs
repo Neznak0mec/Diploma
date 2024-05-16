@@ -19,5 +19,8 @@ public enum TranscriptionTaskStatus
         
     queuedForFingerprint = 10,
     fingerprinted = 11,
-    fingerprinting = 12
+    fingerprinting = 12,
+    
+    queuedForFingerprintJingle = 20,
+    fingerprintedJingle = 21
 }

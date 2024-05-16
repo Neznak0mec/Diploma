@@ -6,7 +6,6 @@ class TasksCollection:
     def __init__(self, connection: psycopg2.extensions.connection):
         self.connection: psycopg2.extensions.connection = connection
 
-
     def get_task(self):
         cursor = self.connection.cursor()
         cursor.execute("""SELECT * FROM \"Audios\" WHERE status = %s""", (0,))
@@ -19,7 +18,7 @@ class TasksCollection:
 
     def get_fingerprint_tasks(self):
         cursor = self.connection.cursor()
-        cursor.execute("""SELECT * FROM \"Audios\" WHERE status = %s""", (10,))
+        cursor.execute("""SELECT * FROM \"Audios\" WHERE status = %s OR status = %s""", (10, 20,))
         result = cursor.fetchall()
         res = []
         for i in result:

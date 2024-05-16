@@ -33,7 +33,7 @@ class LocalMusicRecognizer:
     def __init__(self):
         self.djv = Dejavu(config)
 
-    async def recognize(self, segment: AudioSegment, all_results=False, use_network = False) -> list[str] or str:
+    async def recognize(self, segment: AudioSegment, all_results=False, use_network=False) -> list[str] or str:
         song = self.djv.recognize(SegmentRecognizer, segment)
 
         if use_network and song['results'] == [] and not all_results:

@@ -1,3 +1,4 @@
+using AudioCaptureServer.AudioCapture;
 using AudioCaptureServer.DataBase;
 using AudioCaptureServer.DataBase.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -73,4 +74,45 @@ public class AudioController : ControllerBase
 
         return File(fileStream, "application/octet-stream", audio.fileName);
     }
+    
+    
+    [ProducesResponseType(200)]
+    [HttpPost("pause/{radioName?}")]
+    public IActionResult Pause([FromServices] RadioMaster radioMaster, string? radioName = null)
+    {
+        if (radioName == null)
+        {
+            radioMaster.PauseRadioCapture();
+        }
+        else
+        {
+            radioMaster.PauseRadioCapture(radioName);
+        }
+
+        return Ok();
+    }
+
+    [ProducesResponseType(200)]
+    [HttpPost("continue/{radioName?}")]
+    public IActionResult Continue([FromServices] RadioMaster radioMaster, string? radioName = null)
+    {
+        if (radioName == null)
+        {
+            radioMaster.ResumeRadioCapture();
+        }
+        else
+        {
+            radioMaster.ResumeRadioCapture(radioName);
+        }
+
+        return Ok();
+    }
+    
+    [ProducesResponseType(typeof(Dictionary<string, bool>),200)]
+    [HttpGet("status")]
+    public IActionResult GetStatus([FromServices] RadioMaster radioMaster)
+    {
+        return Ok(radioMaster.GetStatus());
+    }
+    
 }

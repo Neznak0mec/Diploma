@@ -50,23 +50,18 @@ class FindMaster:
 
         return news
 
-    def find_jangles(self, segments: list[TextSegment]) -> list[int]:
-    # def find_jangles(self, pattern: list[str], segments: list[TextSegment]) -> list[int]:
-        # if not pattern:
-        #     return []
-        #
-        # start_pattern = re.compile(fr"({pattern[0]}\w*)",
-        #                            re.IGNORECASE)
-        #
-        # end_part = None
-        # if len(pattern) > 1:
-        #     end_part = re.compile(fr"({pattern[1]}\w*)",
-        #                           re.IGNORECASE)
-        start_pattern = re.compile(r"(русск\w*)",
-                                   re.IGNORECASE)
+    def find_jangles(self, segments: list[TextSegment], radio_name: str) -> list[int]:
+        name = radio_name.split()
+        if len(name) == 1:
+            start_pattern = re.compile(r"(" + name[0][4:] + r"\w*)",
+                                       re.IGNORECASE)
+            end_part = None
+        else:
+            start_pattern = re.compile(r"(" + name[0][4:] + r"\w*)",
+                                       re.IGNORECASE)
+            end_part = re.compile(r"(" + name[1][4:] + r"\w*)",
+                                  re.IGNORECASE)
 
-        end_part = re.compile(r"(рад\w*)",
-                              re.IGNORECASE)
 
         time_of_jangles = []
 

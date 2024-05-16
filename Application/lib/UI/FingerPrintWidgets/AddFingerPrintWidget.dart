@@ -20,6 +20,9 @@ class _AddFingerPrintWidgetState extends State<AddFingerPrintWidget> {
   String? _filePath;
   String? _fileName;
 
+  bool isJingle = false;
+  String? selectedRadio;
+
   final FingerPrintState parent;
 
   _AddFingerPrintWidgetState({required this.parent});
@@ -77,6 +80,36 @@ class _AddFingerPrintWidgetState extends State<AddFingerPrintWidget> {
               labelText: "Имя",
             ),
           ),
+          // checkbox is audio is jingle, if enable add select to select radio station
+          CheckboxListTile(
+            title: const Text('Джинл?'),
+            value: isJingle,
+            onChanged: (bool? value) {
+              setState(() {
+                isJingle = value!;
+              });
+            },
+          ),
+          Row(children: [
+            if (isJingle) // Dropdown is only visible when the checkbox is checked
+              DropdownButton<String>(
+                value: selectedRadio,
+                hint: const Text('Радиостанция'),
+                items: <String>['Radio1', 'Radio2', 'Radio3', 'Radio4']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedRadio = newValue;
+                  });
+                },
+              ),
+          ],),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -98,7 +131,6 @@ class _AddFingerPrintWidgetState extends State<AddFingerPrintWidget> {
               ),
             ],
           ),
-          const SizedBox(height: 10.0),
         ],
       ),
     );

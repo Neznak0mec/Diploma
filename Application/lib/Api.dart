@@ -137,4 +137,35 @@ class Api {
     return res;
 
   }
+
+
+  //radiostation recording
+  static Future<Map<String,bool>> radioRecordingStats() async {
+    var r = await Requests.get("$baseUrl/audio/status");
+    var res = <String,bool>{};
+    for (var i in r.json().keys) {
+      res[i] = r.json()[i];
+    }
+    return res;
+  }
+
+  //start recording
+  static Future startRecording(String radioName) async {
+    await Requests.post("$baseUrl/audio/continue/$radioName");
+  }
+
+  //stop recording
+  static Future stopRecording(String radioName) async {
+    await Requests.post("$baseUrl/audio/pause/$radioName");
+  }
+
+  //stop all recordings
+  static Future stopAllRecordings() async {
+    await Requests.post("$baseUrl/audio/pause");
+  }
+
+  //start all recordings
+  static Future startAllRecordings() async {
+    await Requests.post("$baseUrl/audio/continue");
+  }
 }
