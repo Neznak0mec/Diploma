@@ -20,6 +20,7 @@
     <Folder Include="API\" />
     <Folder Include="FingerPrint\" />
     <Folder Include="Radio\" />
+    <Folder Include="records\" />
   </ItemGroup>
 
 </Project>

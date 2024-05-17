@@ -5,3 +5,5 @@ Radio/AudioCaptureServer/obj
 Radio/Recognizer/venv
 Radio/Recognizer/.venv
 __pycache__/
+Radio/AudioCaptureServer
+.idea

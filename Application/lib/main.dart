@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'Settings.dart';
 import 'UI/Diograms/DiogramWidget.dart';
 import 'UI/RadioWidgets/RadioPage.dart';
+import 'UI/SearchWidgets/SearchPage.dart';
 import 'UI/SettigsWidget/Settings.dart';
 
 void main() {
@@ -59,7 +60,6 @@ class MyHomePageState extends State<MyHomePage> {
               child: NavigationRail(
                 extended: constraints.maxWidth >= 600 && extended,
                 destinations: const [
-
                   NavigationRailDestination(
                       icon: Icon(Icons.radio), label: Text('Радио')),
                   NavigationRailDestination(
@@ -68,8 +68,8 @@ class MyHomePageState extends State<MyHomePage> {
                       icon: Icon(Icons.search), label: Text('Поиск')),
                   NavigationRailDestination(
                       icon: Icon(Icons.music_note), label: Text('Музыка')),
-                  NavigationRailDestination(
-                      icon: Icon(Icons.analytics), label: Text('Статистика')),
+                  // NavigationRailDestination(
+                  //     icon: Icon(Icons.analytics), label: Text('Статистика')),
                   NavigationRailDestination(
                       icon: Icon(Icons.settings), label: Text('Настройки')),
                   NavigationRailDestination(
@@ -77,7 +77,7 @@ class MyHomePageState extends State<MyHomePage> {
                 ],
                 selectedIndex: selectedIndex,
                 onDestinationSelected: (value) {
-                  if (value == 6) {
+                  if (value == 5) {
                     setState(() {
                       extended = !extended;
                     });
@@ -114,15 +114,17 @@ class MyHomePageState extends State<MyHomePage> {
           updateMainWidget(AudioPage(parent: this));
           break;
         case 2:
-          updateMainWidget(const FingerPrintPage());
+          updateMainWidget(TranscriptionSearchPage());
           break;
+          // updateMainWidget(const FingerPrintPage());
+          // break;
+        // case 3:
+        //   updateMainWidget(const TranscriptionAnalysisWidget());
+        //   break;
         case 3:
-          updateMainWidget(const TranscriptionAnalysisWidget());
+          updateMainWidget(const FingerPrintPage());
           break;
         case 4:
-          updateMainWidget(const FingerPrintPage());
-          break;
-        case 5:
           updateMainWidget(SettingsPage(parent: this));
           break;
         default:
