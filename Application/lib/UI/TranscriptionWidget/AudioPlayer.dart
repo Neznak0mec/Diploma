@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:abiba/UI/SnackBars/FlashMessageError.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -137,10 +136,10 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                         icon: const Icon(Icons.pause),
                         onPressed: isPlaying ? _pause : null,
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.stop),
-                        onPressed: isPlaying ? _stop : null,
-                      ),
+                      // IconButton(
+                      //   icon: const Icon(Icons.stop),
+                      //   onPressed: isPlaying ? _stop : null,
+                      // ),
                     ],
                   ),
                   Row(

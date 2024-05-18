@@ -2,7 +2,6 @@ import 'package:abiba/UI/AudioWidgets/AudioPage.dart';
 import 'package:abiba/UI/FingerPrintWidgets/FingerPrintPage.dart';
 import 'package:flutter/material.dart';
 import 'Settings.dart';
-import 'UI/Diograms/DiogramWidget.dart';
 import 'UI/RadioWidgets/RadioPage.dart';
 import 'UI/SearchWidgets/SearchPage.dart';
 import 'UI/SettigsWidget/Settings.dart';
@@ -53,8 +52,8 @@ class MyHomePageState extends State<MyHomePage> {
     }
 
     return LayoutBuilder(builder: (context, constraints) {
-      return Scaffold(
-        body: Row(
+      return SafeArea(
+        child: Row(
           children: [
             SafeArea(
               child: NavigationRail(
@@ -114,7 +113,7 @@ class MyHomePageState extends State<MyHomePage> {
           updateMainWidget(AudioPage(parent: this));
           break;
         case 2:
-          updateMainWidget(TranscriptionSearchPage());
+          updateMainWidget(TranscriptionSearchPage(parent: this));
           break;
           // updateMainWidget(const FingerPrintPage());
           // break;

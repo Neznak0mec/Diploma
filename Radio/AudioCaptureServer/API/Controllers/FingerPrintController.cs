@@ -47,12 +47,12 @@ public class FingerPrintController : ControllerBase {
             if (jingle == "true")
             {
                 name += "<jingle>";
-                task = new Audio(radioName,name,"FingerPrint",
+                task = new Audio(radioName,file.FileName,"FingerPrint",
                     DateTime.Now,DateTime.Now,20);
             }
             else
             {
-                task = new Audio(null,name,"FingerPrint",
+                task = new Audio(null,file.FileName,"FingerPrint",
                     DateTime.Now,DateTime.Now,10);
             }
 

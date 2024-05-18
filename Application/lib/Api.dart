@@ -124,6 +124,14 @@ class Api {
     return res.statusCode;
   }
 
+  static Future<int> sendJingleToServer(String name, String path, String radioName) async {
+    var url = Uri.parse("$baseUrl/fingerprint?name=$name&jingle=true&radioName=$radioName");
+    var request = http.MultipartRequest('POST', url);
+    request.files.add(await http.MultipartFile.fromPath('file', path));
+    var res = await request.send();
+    return res.statusCode;
+  }
+
   static Future<List<Transcription>> getAllTranscriptions() async {
     //use existing functions
     var audios = await getAllAudioList();

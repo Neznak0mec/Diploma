@@ -8,10 +8,9 @@ class FlashMessageSuccess extends SnackBar {
   const FlashMessageSuccess(
       this.message,
       this.context, {
-        Key? key,
+        super.key,
         this.time = 10,
       }) : super(
-    key: key,
     content: const Text(''),
   );
 

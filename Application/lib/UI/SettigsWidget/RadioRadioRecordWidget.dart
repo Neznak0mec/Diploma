@@ -109,7 +109,7 @@ class RadioRecordingCheckboxesState extends State<RadioRecordingCheckboxes> {
               Checkbox(
                 value: _radioRecording[i],
                 onChanged: (bool? value) async {
-                  var snackBar;
+                  FlashMessageSuccess snackBar;
                   if (value!) {
                     await Api.startRecording(i);
                     snackBar = FlashMessageSuccess("Запись $i начата", context);

@@ -3,18 +3,18 @@ import 'package:abiba/DataClasses/Radio.dart';
 import 'package:abiba/UI/FingerPrintWidgets/FingerPrintPage.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../SnackBars/FlashMessageError.dart';
 
 class AddFingerPrintWidget extends StatefulWidget {
-  const AddFingerPrintWidget({Key? key, required this.parent}) : super(key: key);
+  const AddFingerPrintWidget({super.key, required this.parent});
 
   final FingerPrintState parent;
 
   @override
-  _AddFingerPrintWidgetState createState() => _AddFingerPrintWidgetState(parent: parent);
+  _AddFingerPrintWidgetState createState() =>
+      _AddFingerPrintWidgetState(parent: parent);
 }
 
 class _AddFingerPrintWidgetState extends State<AddFingerPrintWidget> {
@@ -69,13 +69,29 @@ class _AddFingerPrintWidgetState extends State<AddFingerPrintWidget> {
 
   void sendFile() async {
     if (_fileName != null) {
-      var res = await Api.sendAudioToServer(_nameController.text, _filePath!);
-      if (res != 200) {
-        var bar = FlashMessageError("Ошибка при отправке файла", context);
-        ScaffoldMessenger.of(context).showSnackBar(bar);
-        return;
+      if (isJingle) {
+        if (selectedRadio == null) {
+          var bar = FlashMessageError("Выберите радиостанцию", context);
+          ScaffoldMessenger.of(context).showSnackBar(bar);
+          return;
+        }
+        var res = await Api.sendJingleToServer(
+            _nameController.text, _filePath!, selectedRadio!);
+        if (res != 200) {
+          var bar = FlashMessageError("Ошибка при отправке файла", context);
+          ScaffoldMessenger.of(context).showSnackBar(bar);
+          return;
+        }
+        parent.updateGrid();
+      } else {
+        var res = await Api.sendAudioToServer(_nameController.text, _filePath!);
+        if (res != 200) {
+          var bar = FlashMessageError("Ошибка при отправке файла", context);
+          ScaffoldMessenger.of(context).showSnackBar(bar);
+          return;
+        }
+        parent.updateGrid();
       }
-      parent.updateGrid();
     }
   }
 
@@ -116,7 +132,7 @@ class _AddFingerPrintWidgetState extends State<AddFingerPrintWidget> {
                   value: selectedRadio,
                   hint: const Text('Радиостанция'),
                   items: _radioList.map<DropdownMenuItem<String>>(
-                        (MyRadio value) {
+                    (MyRadio value) {
                       return DropdownMenuItem<String>(
                         value: value.name,
                         child: Text(value.name),

@@ -2,6 +2,7 @@ import 'package:abiba/Api.dart';
 import 'package:abiba/DataClasses/Transcription.dart';
 import 'package:flutter/material.dart';
 
+import '../../Settings.dart';
 import 'AudioPlayer.dart';
 
 class AudioTranscriptionWidget extends StatelessWidget {
@@ -28,7 +29,10 @@ class AudioTranscriptionWidget extends StatelessWidget {
                     child: _buildTimingText(),
                   ),
                 ),
-                const VerticalDivider(color: Colors.black,width: 5,),
+                const VerticalDivider(
+                  color: Colors.black,
+                  width: 5,
+                ),
                 // Серая линия для разделения зон
                 Expanded(
                   flex: 2,
@@ -40,7 +44,7 @@ class AudioTranscriptionWidget extends StatelessWidget {
               ],
             ),
           ),
-          const Divider(color: Colors.black,height: 5),
+          const Divider(color: Colors.black, height: 5),
           Expanded(
             flex: 1,
             child: _buildAudioPlayer(),
@@ -72,7 +76,11 @@ class AudioTranscriptionWidget extends StatelessWidget {
       segments.add(Column(
         children: [
           Text(
-            segment.trackName == "Not Found"
+            (segment.trackName.contains("(Online)") &&
+                            !SettingsService.INTERNET_AUDIO
+                        ? "Not Found"
+                        : segment.trackName) ==
+                    "Not Found"
                 ? "Трек не найден"
                 : segment.trackName,
             textScaler: const TextScaler.linear(2),
