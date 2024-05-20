@@ -10,9 +10,9 @@ public class FingerPrintController : ControllerBase {
     
     [ProducesResponseType(typeof(List<Audio>),200)]
     [HttpGet("all")]
-    public IActionResult  GetAll([FromServices] DataBase.MyDataBase myDataBase)
+    public IActionResult GetAll([FromServices] DataBase.MyDataBase myDataBase)
     {
-        var res =  myDataBase.audioCollection.GetAll(null);
+        var res =  myDataBase.audioCollection.GetAll(null,true);
         return Ok(res);
     }
     

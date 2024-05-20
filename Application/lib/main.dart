@@ -62,8 +62,8 @@ class MyHomePageState extends State<MyHomePage> {
                 destinations: const [
                   NavigationRailDestination(
                       icon: Icon(Icons.radio), label: Text('Радио')),
-                  NavigationRailDestination(
-                      icon: Icon(Icons.disc_full), label: Text('Записи')),
+                  // NavigationRailDestination(
+                  //     icon: Icon(Icons.disc_full), label: Text('Записи')),
                   NavigationRailDestination(
                       icon: Icon(Icons.search), label: Text('Поиск')),
                   NavigationRailDestination(
@@ -110,10 +110,10 @@ class MyHomePageState extends State<MyHomePage> {
         case 0:
           updateMainWidget(const RadioPage());
           break;
+        // case 1:
+        //   updateMainWidget(AudioPage(parent: this));
+        //   break;
         case 1:
-          updateMainWidget(AudioPage(parent: this));
-          break;
-        case 2:
           updateMainWidget(TranscriptionSearchPage(parent: this));
           break;
           // updateMainWidget(const FingerPrintPage());
@@ -121,10 +121,10 @@ class MyHomePageState extends State<MyHomePage> {
         // case 3:
         //   updateMainWidget(const TranscriptionAnalysisWidget());
         //   break;
-        case 3:
+        case 2:
           updateMainWidget(const FingerPrintPage());
           break;
-        case 4:
+        case 3:
           updateMainWidget(SettingsPage(parent: this));
           break;
         default:

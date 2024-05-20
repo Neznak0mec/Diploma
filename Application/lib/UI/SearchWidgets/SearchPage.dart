@@ -10,6 +10,7 @@ import '../TranscriptionWidget/AudioTranscriptionWidget.dart';
 
 class TranscriptionSearchPage extends StatefulWidget {
   const TranscriptionSearchPage({super.key, required this.parent});
+
   final MyHomePageState parent;
 
   @override
@@ -22,7 +23,6 @@ class _TranscriptionSearchPageState extends State<TranscriptionSearchPage> {
   final TextEditingController _phraseController = TextEditingController();
   DateTime? _selectedDate;
   String? _selectedRadioName;
-  List<MyAudio> _audios = [];
   List<MyAudio> _filteredAudios = [];
   List<String> _radioNames = [];
   List<String> _tracksNames = [];
@@ -40,12 +40,13 @@ class _TranscriptionSearchPageState extends State<TranscriptionSearchPage> {
   }
 
   Future<void> _fetchTranscriptions() async {
-    final transcriptions = await Api.getAllAudioList();
+    final transcriptions = (await Api.getAllAudioList())
+        .where((e) => e.status == 0 || e.status == 1)
+        .toList();
     final radioNames = (await Api.getRadioList()).map((e) => e.name).toList();
     final trackNames = await Api.getTrackNames();
 
     setState(() {
-      _audios = transcriptions;
       _radioNames = radioNames;
       _filteredAudios = transcriptions;
       _tracksNames = trackNames;
@@ -104,10 +105,12 @@ class _TranscriptionSearchPageState extends State<TranscriptionSearchPage> {
           _filteredAudios.sort((a, b) => a.fileName.compareTo(b.fileName));
           break;
         case 1:
-          _filteredAudios.sort((a, b) => a.startRecording.compareTo(b.startRecording));
+          _filteredAudios
+              .sort((a, b) => a.startRecording.compareTo(b.startRecording));
           break;
         case 2:
-          _filteredAudios.sort((a, b) => a.endRecording.compareTo(b.endRecording));
+          _filteredAudios
+              .sort((a, b) => a.endRecording.compareTo(b.endRecording));
           break;
         case 3:
           _filteredAudios.sort((a, b) => a.radioName!.compareTo(b.radioName!));
@@ -155,7 +158,8 @@ class _TranscriptionSearchPageState extends State<TranscriptionSearchPage> {
                   child: TypeAheadFormField<String>(
                     textFieldConfiguration: TextFieldConfiguration(
                       controller: _musicController,
-                      decoration: const InputDecoration(labelText: 'Музыкальный трек'),
+                      decoration:
+                      const InputDecoration(labelText: 'Музыкальный трек'),
                     ),
                     suggestionsCallback: (pattern) async {
                       if (pattern.length > 1) {
@@ -186,7 +190,8 @@ class _TranscriptionSearchPageState extends State<TranscriptionSearchPage> {
               children: [
                 Text(_selectedDate == null
                     ? 'Дата записи не выбрана'
-                    : 'Выбрана дата: ${DateFormat.yMMMd().format(_selectedDate!)}'),
+                    : 'Выбрана дата: ${DateFormat.yMMMd().format(
+                    _selectedDate!)}'),
                 TextButton(
                   onPressed: () => _selectDate(context),
                   child: const Text('Выбор даты'),
@@ -203,7 +208,8 @@ class _TranscriptionSearchPageState extends State<TranscriptionSearchPage> {
             const SizedBox(height: 16.0),
             const Align(
               alignment: Alignment.centerLeft,
-              child: Text('Результаты поиска:', style: TextStyle(fontSize: 18.0)),
+              child:
+              Text('Результаты поиска:', style: TextStyle(fontSize: 18.0)),
             ),
             const SizedBox(height: 16.0),
             Expanded(
@@ -212,7 +218,8 @@ class _TranscriptionSearchPageState extends State<TranscriptionSearchPage> {
                   return SingleChildScrollView(
                     scrollDirection: Axis.vertical,
                     child: ConstrainedBox(
-                      constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                      constraints:
+                      BoxConstraints(minWidth: constraints.maxWidth),
                       child: DataTable(
                         showCheckboxColumn: false,
                         sortColumnIndex: _sortColumnIndex,
@@ -243,28 +250,8 @@ class _TranscriptionSearchPageState extends State<TranscriptionSearchPage> {
                             },
                           ),
                         ],
-                        rows: _filteredAudios.map((audio) {
-                          return DataRow(
-                            cells: [
-                              DataCell(Text(audio.fileName)),
-                              DataCell(Text(DateFormat.yMMMd().add_jm().format(audio.startRecording))),
-                              DataCell(Text(DateFormat.yMMMd().add_jm().format(audio.endRecording))),
-                              DataCell(Text(audio.radioName ?? '')),
-                            ],
-                            onSelectChanged: (selected) async {
-                              if (selected ?? false) {
-                                Transcription? transcription = await Api.getTranscription(audio.fileName);
-                                if (transcription == null) {
-                                  // show error FlashMessageError
-                                  var bar = FlashMessageError("Ошибка при загрузке транскрипции", context);
-                                  ScaffoldMessenger.of(context).showSnackBar(bar);
-                                  return;
-                                }
-                                parent.updateMainWidget(AudioTranscriptionWidget(transcription: transcription));
-                              }
-                            },
-                          );
-                        }).toList(),
+                        rows: _getRows(),
+
                       ),
                     ),
                   );
@@ -275,5 +262,51 @@ class _TranscriptionSearchPageState extends State<TranscriptionSearchPage> {
         ),
       ),
     );
+  }
+
+  // ger table rows
+  List<DataRow> _getRows() {
+    return _filteredAudios.map((audio) {
+      return DataRow(
+        cells: [
+          DataCell(Text(
+            audio.fileName
+          )),
+          DataCell(Text(DateFormat.yMMMd()
+              .add_jm()
+              .format(audio.startRecording))),
+          DataCell(Text(DateFormat.yMMMd()
+              .add_jm()
+              .format(audio.endRecording))),
+          DataCell(Text(audio.radioName ?? '')),
+        ],
+        color: audio.status == 1 ? WidgetStateProperty.all(Colors.greenAccent) : WidgetStateProperty.all(Colors.redAccent),
+        onSelectChanged: (selected) async {
+          if (selected ?? false) {
+            if (audio.status == 0) {
+              var bar = FlashMessageError(
+                  "Аудио еще не обработано", context);
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(bar);
+              return;
+            }
+
+            Transcription? transcription =
+            await Api.getTranscription(audio.fileName);
+            if (transcription == null) {
+              var bar = FlashMessageError(
+                  "Ошибка при загрузке транскрипции",
+                  context);
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(bar);
+              return;
+            }
+            parent.updateMainWidget(
+                AudioTranscriptionWidget(
+                    transcription: transcription));
+          }
+        },
+      );
+    }).toList();
   }
 }

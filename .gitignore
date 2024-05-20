@@ -1,5 +1,5 @@
 Application/build
-Application/linux/build
+Application/linux
 Radio/AudioCaptureServer/bin
 Radio/AudioCaptureServer/obj
 Radio/Recognizer/venv

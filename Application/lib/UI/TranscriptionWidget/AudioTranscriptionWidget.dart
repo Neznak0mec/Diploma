@@ -83,7 +83,7 @@ class AudioTranscriptionWidget extends StatelessWidget {
                         : segment.trackName) ==
                     "Not Found"
                 ? "Трек не найден"
-                : segment.trackName,
+                : segment.trackName.replaceAll("(Online)", "(отсутвует эталон)"),
             textScaler: const TextScaler.linear(2),
           ),
           ...subSegments

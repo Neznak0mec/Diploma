@@ -19,9 +19,19 @@ public class AudioCollection
         connection.SaveChanges();
     }
 
-    public List<Audio> GetAll(string? radioName = null)
+    public List<Audio> GetAll(string? radioName = null,bool fingerptint = false)
     { 
         connection.Reload(connection.Audios);
+
+        if (fingerptint)
+            return connection.Audios.Where(x =>
+                x.status == 10 ||
+                x.status == 11 ||
+                x.status == 20 ||
+                x.status == 21).ToList();
+
+        if (radioName == null)
+            return connection.Audios.ToList();
         return connection.Audios.Where(x => x.radioName == radioName).ToList();
     }
 
