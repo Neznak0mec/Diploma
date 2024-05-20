@@ -1,9 +1,11 @@
+import 'package:abiba/DataClasses/Audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart';
 import '../../Api.dart';
 import '../../DataClasses/Transcription.dart';
 import '../../main.dart';
+import '../SnackBars/FlashMessageError.dart';
 import '../TranscriptionWidget/AudioTranscriptionWidget.dart';
 
 class TranscriptionSearchPage extends StatefulWidget {
@@ -20,9 +22,10 @@ class _TranscriptionSearchPageState extends State<TranscriptionSearchPage> {
   final TextEditingController _phraseController = TextEditingController();
   DateTime? _selectedDate;
   String? _selectedRadioName;
-  List<Transcription> _transcriptions = [];
-  List<Transcription> _filteredTranscriptions = [];
+  List<MyAudio> _audios = [];
+  List<MyAudio> _filteredAudios = [];
   List<String> _radioNames = [];
+  List<String> _tracksNames = [];
   bool _sortAscending = true;
   int _sortColumnIndex = 0;
 
@@ -37,34 +40,28 @@ class _TranscriptionSearchPageState extends State<TranscriptionSearchPage> {
   }
 
   Future<void> _fetchTranscriptions() async {
-    final transcriptions = await Api.getAllTranscriptions();
-    final radioNames = transcriptions.map((t) => t.radioName).toSet().toList();
+    final transcriptions = await Api.getAllAudioList();
+    final radioNames = (await Api.getRadioList()).map((e) => e.name).toList();
+    final trackNames = await Api.getTrackNames();
 
     setState(() {
-      _transcriptions = transcriptions;
+      _audios = transcriptions;
       _radioNames = radioNames;
-      _filteredTranscriptions = transcriptions;
+      _filteredAudios = transcriptions;
+      _tracksNames = trackNames;
     });
   }
 
-  void _filterResults() {
-    setState(() {
-      _filteredTranscriptions = _transcriptions.where((transcription) {
-        bool matchesDate = _selectedDate == null ||
-            (transcription.startTime
-                .isBefore(_selectedDate!.add(const Duration(days: 1))) &&
-                transcription.endTime.isAfter(_selectedDate!));
-        bool matchesRadioName = _selectedRadioName == null ||
-            transcription.radioName == _selectedRadioName;
-        bool matchesMusic = _musicController.text.isEmpty ||
-            transcription.segments.any((segment) =>
-                segment.trackName.contains(_musicController.text, 0));
-        bool matchesPhrase = _phraseController.text.isEmpty ||
-            transcription.segments.any((segment) =>
-                segment.text.toLowerCase().contains(_phraseController.text.toLowerCase(), 0));
+  Future<void> _filterResults() async {
+    List<MyAudio> audios = await Api.SearchAudios(
+      _selectedRadioName,
+      _musicController.text,
+      _phraseController.text,
+      _selectedDate,
+    );
 
-        return matchesDate && matchesRadioName && matchesMusic && matchesPhrase;
-      }).toList();
+    setState(() {
+      _filteredAudios = audios;
     });
   }
 
@@ -80,20 +77,19 @@ class _TranscriptionSearchPageState extends State<TranscriptionSearchPage> {
       setState(() {
         _selectedDate = pickedDate;
       });
-      _filterResults();
+      await _filterResults();
     }
   }
 
   List<String> _getTrackNameSuggestions(String query) {
     final matches = <String>{};
-    for (var transcription in _transcriptions) {
-      for (var segment in transcription.segments) {
-        if (segment.trackName.toLowerCase().contains(query.toLowerCase())) {
-          matches.add(segment.trackName);
-        }
-        if (matches.length == 10) break;
+    for (final trackName in _tracksNames) {
+      if (trackName.toLowerCase().contains(query.toLowerCase())) {
+        matches.add(trackName);
       }
-      if (matches.length == 10) break;
+      if (matches.length >= 10) {
+        break;
+      }
     }
     return matches.toList();
   }
@@ -105,21 +101,21 @@ class _TranscriptionSearchPageState extends State<TranscriptionSearchPage> {
 
       switch (columnIndex) {
         case 0:
-          _filteredTranscriptions.sort((a, b) => a.fileName.compareTo(b.fileName));
+          _filteredAudios.sort((a, b) => a.fileName.compareTo(b.fileName));
           break;
         case 1:
-          _filteredTranscriptions.sort((a, b) => a.startTime.compareTo(b.startTime));
+          _filteredAudios.sort((a, b) => a.startRecording.compareTo(b.startRecording));
           break;
         case 2:
-          _filteredTranscriptions.sort((a, b) => a.endTime.compareTo(b.endTime));
+          _filteredAudios.sort((a, b) => a.endRecording.compareTo(b.endRecording));
           break;
         case 3:
-          _filteredTranscriptions.sort((a, b) => a.radioName.compareTo(b.radioName));
+          _filteredAudios.sort((a, b) => a.radioName!.compareTo(b.radioName!));
           break;
       }
 
       if (!ascending) {
-        _filteredTranscriptions = _filteredTranscriptions.reversed.toList();
+        _filteredAudios = _filteredAudios.reversed.toList();
       }
     });
   }
@@ -146,11 +142,11 @@ class _TranscriptionSearchPageState extends State<TranscriptionSearchPage> {
                         child: Text(name),
                       );
                     }).toList(),
-                    onChanged: (value) {
+                    onChanged: (value) async {
                       setState(() {
                         _selectedRadioName = value;
                       });
-                      _filterResults();
+                      await _filterResults();
                     },
                   ),
                 ),
@@ -173,9 +169,13 @@ class _TranscriptionSearchPageState extends State<TranscriptionSearchPage> {
                         title: Text(suggestion),
                       );
                     },
-                    onSuggestionSelected: (suggestion) {
+                    onSuggestionSelected: (suggestion) async {
                       _musicController.text = suggestion;
-                      _filterResults();
+                      await _filterResults();
+                    },
+                    onSaved: (suggestion) async {
+                      _musicController.text = suggestion ?? '';
+                      await _filterResults();
                     },
                   ),
                 ),
@@ -198,7 +198,7 @@ class _TranscriptionSearchPageState extends State<TranscriptionSearchPage> {
               decoration: const InputDecoration(
                 labelText: 'Фраза, слова',
               ),
-              onChanged: (text) => _filterResults(),
+              onChanged: (text) async => await _filterResults(),
             ),
             const SizedBox(height: 16.0),
             const Align(
@@ -210,7 +210,7 @@ class _TranscriptionSearchPageState extends State<TranscriptionSearchPage> {
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
+                    scrollDirection: Axis.vertical,
                     child: ConstrainedBox(
                       constraints: BoxConstraints(minWidth: constraints.maxWidth),
                       child: DataTable(
@@ -243,16 +243,23 @@ class _TranscriptionSearchPageState extends State<TranscriptionSearchPage> {
                             },
                           ),
                         ],
-                        rows: _filteredTranscriptions.map((transcription) {
+                        rows: _filteredAudios.map((audio) {
                           return DataRow(
                             cells: [
-                              DataCell(Text(transcription.fileName)),
-                              DataCell(Text(DateFormat.yMMMd().add_jm().format(transcription.startTime))),
-                              DataCell(Text(DateFormat.yMMMd().add_jm().format(transcription.endTime))),
-                              DataCell(Text(transcription.radioName)),
+                              DataCell(Text(audio.fileName)),
+                              DataCell(Text(DateFormat.yMMMd().add_jm().format(audio.startRecording))),
+                              DataCell(Text(DateFormat.yMMMd().add_jm().format(audio.endRecording))),
+                              DataCell(Text(audio.radioName ?? '')),
                             ],
-                            onSelectChanged: (selected) {
+                            onSelectChanged: (selected) async {
                               if (selected ?? false) {
+                                Transcription? transcription = await Api.getTranscription(audio.fileName);
+                                if (transcription == null) {
+                                  // show error FlashMessageError
+                                  var bar = FlashMessageError("Ошибка при загрузке транскрипции", context);
+                                  ScaffoldMessenger.of(context).showSnackBar(bar);
+                                  return;
+                                }
                                 parent.updateMainWidget(AudioTranscriptionWidget(transcription: transcription));
                               }
                             },

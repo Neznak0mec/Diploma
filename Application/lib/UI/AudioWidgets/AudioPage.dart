@@ -1,9 +1,9 @@
-import 'package:abiba/DataClasses/Audio.dart';
-import 'package:abiba/UI/AudioWidgets/AudioWidget.dart';
-import 'package:abiba/UI/DefaultWidgets/ErrPage.dart';
-import 'package:abiba/main.dart';
 import 'package:flutter/material.dart';
 import '../../Api.dart';
+import '../../DataClasses/Audio.dart';
+import '../../main.dart';
+import '../DefaultWidgets/ErrPage.dart';
+import 'AudioWidget.dart';
 import 'SelectRadioWidget.dart';
 
 class AudioPage extends StatefulWidget {

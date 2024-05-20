@@ -1,7 +1,8 @@
-import 'package:abiba/Api.dart';
-import 'package:abiba/DataClasses/Transcription.dart';
+
 import 'package:flutter/material.dart';
 
+import '../../Api.dart';
+import '../../DataClasses/Transcription.dart';
 import '../../Settings.dart';
 import 'AudioPlayer.dart';
 

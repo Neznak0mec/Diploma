@@ -1,10 +1,10 @@
 
-import 'package:abiba/DataClasses/Audio.dart';
-import 'package:abiba/DataClasses/Transcription.dart';
 import 'package:requests/requests.dart';
 import "package:http/http.dart" as http;
 
+import 'DataClasses/Audio.dart';
 import 'DataClasses/Radio.dart';
+import 'DataClasses/Transcription.dart';
 import 'Settings.dart';
 
 class Api {
@@ -86,8 +86,11 @@ class Api {
   ///////////////////////////////
   // Transcription
   ///////////////////////////////
-  static Future<Transcription>? getTranscription(String fileName) async {
+  static Future<Transcription?> getTranscription(String fileName) async {
       var r = await Requests.get("$baseUrl/transcription/$fileName");
+      if (!r.success){
+        return null;
+      }
       var json = r.json();
     return Transcription.fromJson(json);
   }
@@ -175,5 +178,56 @@ class Api {
   //start all recordings
   static Future startAllRecordings() async {
     await Requests.post("$baseUrl/audio/continue");
+  }
+
+
+  //search audios
+  static Future<List<MyAudio>> SearchAudios([String? radioName, String? musicName, String? text, DateTime? date]) async {
+    List<MyAudio> result = [];
+    String query = "";
+    if (radioName != null && radioName.isNotEmpty) {
+      query += "radioName=$radioName";
+    }
+    if (musicName != null && musicName.isNotEmpty) {
+      if (query.isNotEmpty) {
+        query += "&";
+      }
+      query += "musicName=$musicName";
+    }
+    if (text != null && text.isNotEmpty) {
+      if (query.isNotEmpty) {
+        query += "&";
+      }
+      query += "text=$text";
+    }
+    if (date != null ) {
+      if (query.isNotEmpty) {
+        query += "&";
+      }
+      query += "date=$date";
+    }
+
+    if (query.isEmpty) {
+      return await getAllAudioList();
+    }
+
+    var r = await Requests.get("$baseUrl/audio/search?$query");
+    var audios = r.json();
+    for (var i in audios) {
+      result.add(MyAudio.fromJson(i));
+    }
+
+    return result;
+  }
+
+  //get musics
+  static Future<List<String>> getTrackNames() async {
+    var r = await Requests.get("$baseUrl/audio/musics");
+    var musics = r.json();
+    List<String> res = [];
+    for (var i in musics) {
+      res.add(i);
+    }
+    return res;
   }
 }

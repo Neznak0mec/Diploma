@@ -143,4 +143,99 @@ public class RecordTranscriptionCollection
 
         return recordTranscription;
     }
+
+    public List<string> GetByMusicName(string musicName)
+    {
+        List<string> result = new List<string>();
+        List<int> segments_ids = new List<int>(); 
+        using (var command = _connection.CreateCommand())
+        {
+            command.CommandText = $"SELECT id FROM segments WHERE lower(track_name) LIKE '%' || lower(@musicName) || '%';";
+            command.Parameters.AddWithValue("musicName", musicName);
+            
+            using (var results = command.ExecuteReader())
+            {
+                while (results.Read())
+                {
+                    segments_ids.Add((int)results["id"]);
+                }
+            }; 
+        }
+        
+        foreach (var id in segments_ids)
+        {
+            using (var command = _connection.CreateCommand())
+            {
+                command.CommandText = $"SELECT file_name FROM radio_data WHERE id = @id;";
+                command.Parameters.AddWithValue("id", id);
+                
+                using (var results = command.ExecuteReader())
+                {
+                    while (results.Read())
+                    {
+                        result.Add((string)results["file_name"]);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    
+    public List<string> GetByText(string text)
+    {
+        List<string> result = new List<string>();
+        List<int> segments_ids = new List<int>(); 
+        using (var command = _connection.CreateCommand())
+        {
+            command.CommandText = $"SELECT id FROM segments WHERE lower(text) LIKE '%' || lower(@text) || '%';";
+            command.Parameters.AddWithValue("text", text);
+            
+            using (var results = command.ExecuteReader())
+            {
+                while (results.Read())
+                {
+                    segments_ids.Add((int)results["id"]);
+                }
+            }; 
+        }
+        
+        foreach (var id in segments_ids)
+        {
+            using (var command = _connection.CreateCommand())
+            {
+                command.CommandText = $"SELECT file_name FROM radio_data WHERE id = @id;";
+                command.Parameters.AddWithValue("id", id);
+                
+                using (var results = command.ExecuteReader())
+                {
+                    while (results.Read())
+                    {
+                        result.Add((string)results["file_name"]);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    
+    public List<string> GetAllMusicNames()
+    {
+        List<string> result = new List<string>();
+        using (var command = _connection.CreateCommand())
+        {
+            command.CommandText = $"SELECT track_name FROM segments;";
+            
+            using (var results = command.ExecuteReader())
+            {
+                while (results.Read())
+                {
+                    result.Add((string)results["track_name"]);
+                }
+            }; 
+        }
+        
+        result = result.Distinct().ToList();
+        
+        return result;
+    }
 }

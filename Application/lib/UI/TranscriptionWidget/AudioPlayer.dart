@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:abiba/UI/SnackBars/FlashMessageError.dart';
-import 'package:audioplayers/audioplayers.dart';
+
+// import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+
+import '../SnackBars/FlashMessageError.dart';
 
 class AudioPlayerPage extends StatefulWidget {
   final String audioUrl;
@@ -17,7 +19,7 @@ class AudioPlayerPage extends StatefulWidget {
 }
 
 class _AudioPlayerPageState extends State<AudioPlayerPage> {
-  late AudioPlayer audioPlayer;
+  // late AudioPlayer audioPlayer;
   Duration _duration = const Duration();
   Duration _position = const Duration();
   bool isPlaying = false;
@@ -28,22 +30,22 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
   @override
   void initState() {
     super.initState();
-    audioPlayer = AudioPlayer();
-    audioPlayer.onDurationChanged.listen((Duration duration) {
-      setState(() {
-        _duration = duration;
-      });
-    });
-    audioPlayer.onPositionChanged.listen((Duration position) {
-      setState(() {
-        _position = position;
-      });
-    });
+    // audioPlayer = AudioPlayer();
+    // audioPlayer.onDurationChanged.listen((Duration duration) {
+    //   setState(() {
+    //     _duration = duration;
+    //   });
+    // });
+    // audioPlayer.onPositionChanged.listen((Duration position) {
+    //   setState(() {
+    //     _position = position;
+    //   });
+    // });
   }
 
   @override
   void dispose() {
-    audioPlayer.dispose();
+    // audioPlayer.dispose();
     _debounce?.cancel();
 
     super.dispose();
@@ -80,21 +82,21 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
   Future<void> _play() async {
     localFilePath ??= await _downloadFile(widget.audioUrl, 'audio.mp3');
 
-    await audioPlayer.play(DeviceFileSource(localFilePath!));
+    // await audioPlayer.play(DeviceFileSource(localFilePath!));
     setState(() {
       isPlaying = true;
     });
   }
 
   Future<void> _pause() async {
-    await audioPlayer.pause();
+    // await audioPlayer.pause();
     setState(() {
       isPlaying = false;
     });
   }
 
   Future<void> _stop() async {
-    await audioPlayer.stop();
+    // await audioPlayer.stop();
     setState(() {
       isPlaying = false;
     });
@@ -102,7 +104,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
 
   Future<void> _seekToSecond(int second) async {
     Duration newPosition = Duration(seconds: second);
-    await audioPlayer.seek(newPosition);
+    // await audioPlayer.seek(newPosition);
   }
 
 

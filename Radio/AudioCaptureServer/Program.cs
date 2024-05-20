@@ -20,7 +20,7 @@ class Programm
     static void RunRadio(DataBase.MyDataBase myDataBase, RadioMaster radioMaster)
     {
         //todo
-          radioMaster.Start();
+//          radioMaster.Start();
     }
 
     static void RunAPI(DataBase.MyDataBase myDataBase, RadioMaster radioMaster)
@@ -54,7 +54,7 @@ class Programm
         app.Run();
     }
 
-    static void SetUpLogger()
+    private static void SetUpLogger()
     {
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Information()

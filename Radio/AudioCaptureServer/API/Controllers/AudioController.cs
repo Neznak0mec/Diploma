@@ -115,4 +115,36 @@ public class AudioController : ControllerBase
         return Ok(radioMaster.GetStatus());
     }
     
+    [ProducesResponseType(typeof(List<Audio>),200)]
+    [HttpGet("search")]
+    public IActionResult Search([FromServices] MyDataBase myDataBase, [FromQuery] string? radioName = null, [FromQuery] string? musicName = null, [FromQuery] string? text = null, [FromQuery] DateTime? startDate = null)
+    {
+        var audios = myDataBase.audioCollection.GetAll(radioName);
+
+        if (startDate != null)
+        {
+            audios = audios.FindAll(x => x.startRecording.Date == startDate.Value.Date);
+        }
+        
+        if (musicName != null)
+        {
+            var musics = myDataBase.recordTranscriptionCollection.GetByMusicName(musicName);
+            audios = audios.SelectMany(x => musics.Contains(x.fileName) ? new List<Audio> {x} : new List<Audio>()).ToList();
+        }
+        
+        if (text != null)
+        {
+            var texts = myDataBase.recordTranscriptionCollection.GetByText(text);
+            audios = audios.SelectMany(x => texts.Contains(x.fileName) ? new List<Audio> {x} : new List<Audio>()).ToList();
+        }
+        
+        return Ok(audios);
+    }
+    
+    [ProducesResponseType(typeof(List<String>),200)]
+    [HttpGet("musics")]
+    public IActionResult GetMusics([FromServices] MyDataBase myDataBase)
+    {
+        return Ok(myDataBase.recordTranscriptionCollection.GetAllMusicNames());
+    }
 }

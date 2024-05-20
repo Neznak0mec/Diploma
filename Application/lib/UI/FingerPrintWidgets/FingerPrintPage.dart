@@ -1,7 +1,7 @@
-import 'package:abiba/UI/FingerPrintWidgets/AddFingerPrintWidget.dart';
 import 'package:flutter/material.dart';
 import '../../Api.dart';
 import '../DefaultWidgets/ErrPage.dart';
+import 'AddFingerPrintWidget.dart';
 import 'FingerPrintWidget.dart';
 
 class FingerPrintPage extends StatefulWidget {

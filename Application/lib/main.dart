@@ -1,7 +1,8 @@
-import 'package:abiba/UI/AudioWidgets/AudioPage.dart';
-import 'package:abiba/UI/FingerPrintWidgets/FingerPrintPage.dart';
+
 import 'package:flutter/material.dart';
 import 'Settings.dart';
+import 'UI/AudioWidgets/AudioPage.dart';
+import 'UI/FingerPrintWidgets/FingerPrintPage.dart';
 import 'UI/RadioWidgets/RadioPage.dart';
 import 'UI/SearchWidgets/SearchPage.dart';
 import 'UI/SettigsWidget/Settings.dart';

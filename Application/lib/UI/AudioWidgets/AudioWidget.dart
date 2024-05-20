@@ -1,10 +1,11 @@
-import 'package:abiba/Api.dart';
-import 'package:abiba/UI/TranscriptionWidget/AudioTranscriptionWidget.dart';
+
 import 'package:flutter/material.dart';
+import '../../Api.dart';
 import '../../DataClasses/Audio.dart';
 import 'package:intl/intl.dart';
 
 import '../SnackBars/FlashMessageError.dart';
+import '../TranscriptionWidget/AudioTranscriptionWidget.dart';
 
 
 abstract class AudioWidget extends StatelessWidget {
