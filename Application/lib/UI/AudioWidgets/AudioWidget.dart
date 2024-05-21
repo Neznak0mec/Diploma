@@ -14,7 +14,7 @@ abstract class AudioWidget extends StatelessWidget {
 
 class ShowAudioWidget extends AudioWidget {
   final MyAudio audio;
-  final Function(Widget) updateMainWidget;
+  final Function(Widget, String) updateMainWidget;
 
   const ShowAudioWidget(this.audio, this.updateMainWidget, {super.key});
 
@@ -36,7 +36,7 @@ class ShowAudioWidget extends AudioWidget {
               if (transcription == null) {
                 ScaffoldMessenger.of(context).showSnackBar(FlashMessageError("Не удалось загрузить информацию", context) );
               } else {
-                updateMainWidget(AudioTranscriptionWidget(transcription: transcription));
+                updateMainWidget(AudioTranscriptionWidget(transcription: transcription), "Стенограмма");
               }
             }
           },

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import '../../Api.dart';
@@ -14,9 +13,6 @@ class AudioTranscriptionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Стенограмма'),
-      ),
       body: Column(
         children: [
           Expanded(
@@ -73,7 +69,6 @@ class AudioTranscriptionWidget extends StatelessWidget {
               'Начало: ${((sub.start ?? 0) / 60).floor()}:${(sub.start ?? 0) % 60}, Конец: ${((sub.end ?? 0) / 60).floor()}:${(sub.end ?? 0) % 60}'),
         ));
       }
-
       segments.add(Column(
         children: [
           Text(
@@ -83,7 +78,8 @@ class AudioTranscriptionWidget extends StatelessWidget {
                         : segment.trackName) ==
                     "Not Found"
                 ? "Трек не найден"
-                : segment.trackName.replaceAll("(Online)", "(отсутвует эталон)"),
+                : segment.trackName
+                    .replaceAll("(Online)", "(отсутвует эталон)"),
             textScaler: const TextScaler.linear(2),
           ),
           ...subSegments

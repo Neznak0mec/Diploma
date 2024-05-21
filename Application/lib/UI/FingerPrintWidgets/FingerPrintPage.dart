@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:abiba/DataClasses/Audio.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import '../../Api.dart';
 import '../DefaultWidgets/ErrPage.dart';
@@ -57,14 +60,16 @@ class FingerPrintState extends State<FingerPrintPage> {
             } else {
               List<Widget> radios = [
                 AddFingerPrintWidget(parent: this),
-                ...snapshot.data!.cast<FingerPrintWidget>(),
               ];
+              if (snapshot.hasData) {
+                radios += snapshot.data!.cast<FingerPrintWidget>();
+              }
 
               return Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: <Widget>[
                     Row(
                       children: [
                         Checkbox(
@@ -99,6 +104,9 @@ class FingerPrintState extends State<FingerPrintPage> {
                           )
                       ],
                     ),
+                    const SizedBox(height: 16.0),
+                    const Divider(color: Colors.black, height: 5),
+                    const SizedBox(height: 16.0),
                     Expanded(
                       child: GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

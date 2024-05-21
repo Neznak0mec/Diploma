@@ -126,9 +126,6 @@ class _TranscriptionSearchPageState extends State<TranscriptionSearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Transcription Search'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -205,6 +202,8 @@ class _TranscriptionSearchPageState extends State<TranscriptionSearchPage> {
               ),
               onChanged: (text) async => await _filterResults(),
             ),
+            const SizedBox(height: 16.0),
+            const Divider(color: Colors.black, height: 5),
             const SizedBox(height: 16.0),
             const Align(
               alignment: Alignment.centerLeft,
@@ -301,9 +300,9 @@ class _TranscriptionSearchPageState extends State<TranscriptionSearchPage> {
                   .showSnackBar(bar);
               return;
             }
-            parent.updateMainWidget(
+            parent.updatePage(
                 AudioTranscriptionWidget(
-                    transcription: transcription));
+                    transcription: transcription),"Стенограмма");
           }
         },
       );

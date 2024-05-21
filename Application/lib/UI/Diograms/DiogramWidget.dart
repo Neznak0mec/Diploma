@@ -32,9 +32,6 @@ class _TranscriptionAnalysisWidgetState extends State<TranscriptionAnalysisWidge
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Transcription Analysis'),
-      ),
       body: Column(
         children: [
           Expanded(

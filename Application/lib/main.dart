@@ -37,11 +37,12 @@ class MyHomePage extends StatefulWidget {
 
 class MyHomePageState extends State<MyHomePage> {
   var selectedIndex = 0;
-  var extended = true;
   Widget? page;
+  String pageName = "Радио";
 
-  void updateMainWidget(Widget newWidget) {
+  void updateMainWidget(Widget newWidget, String newPageName) {
     setState(() {
+      pageName = newPageName;
       page = newWidget;
     });
   }
@@ -52,83 +53,92 @@ class MyHomePageState extends State<MyHomePage> {
       updatePage(null);
     }
 
-    return LayoutBuilder(builder: (context, constraints) {
-      return SafeArea(
-        child: Row(
-          children: [
-            SafeArea(
-              child: NavigationRail(
-                extended: constraints.maxWidth >= 600 && extended,
-                destinations: const [
-                  NavigationRailDestination(
-                      icon: Icon(Icons.radio), label: Text('Радио')),
-                  // NavigationRailDestination(
-                  //     icon: Icon(Icons.disc_full), label: Text('Записи')),
-                  NavigationRailDestination(
-                      icon: Icon(Icons.search), label: Text('Поиск')),
-                  NavigationRailDestination(
-                      icon: Icon(Icons.music_note), label: Text('Музыка')),
-                  // NavigationRailDestination(
-                  //     icon: Icon(Icons.analytics), label: Text('Статистика')),
-                  NavigationRailDestination(
-                      icon: Icon(Icons.settings), label: Text('Настройки')),
-                  NavigationRailDestination(
-                      icon: Icon(Icons.density_medium_outlined), label: Text('Свернуть')),
-                ],
-                selectedIndex: selectedIndex,
-                onDestinationSelected: (value) {
-                  if (value == 5) {
-                    setState(() {
-                      extended = !extended;
-                    });
-                  } else {
-                    setState(() {
-                      selectedIndex = value;
-                      updatePage(null);
-                    });
-                  }
-                },
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(pageName),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            const SizedBox(
+              height: 80, // Adjust this value to your preference
+              child: DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                ), child: null,
               ),
             ),
-            Expanded(
-              child: Container(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                child: SafeArea(child: page!) ,
-              ),
+            ListTile(
+              leading: Icon(Icons.radio),
+              title: Text('Радио'),
+              onTap: () {
+                setState(() {
+                  selectedIndex = 0;
+                  updatePage(null);
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.search),
+              title: Text('Поиск'),
+              onTap: () {
+                setState(() {
+                  selectedIndex = 1;
+                  updatePage(null);
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.music_note),
+              title: Text('Музыка'),
+              onTap: () {
+                setState(() {
+                  selectedIndex = 2;
+                  updatePage(null);
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.settings),
+              title: Text('Настройки'),
+              onTap: () {
+                setState(() {
+                  selectedIndex = 3;
+                  updatePage(null);
+                });
+                Navigator.pop(context);
+              },
             ),
           ],
         ),
-      );
-    });
+      ),
+      body: SafeArea(child: page!),
+    );
   }
 
-  void updatePage(Widget? widget) {
+  void updatePage(Widget? widget, [String pageName = ""]) {
     if (widget != null) {
-      updateMainWidget(widget);
+      updateMainWidget(widget, pageName);
     } else {
       switch (selectedIndex) {
         case 0:
-          updateMainWidget(const RadioPage());
+          updateMainWidget(const RadioPage(),"Радио");
           break;
-        // case 1:
-        //   updateMainWidget(AudioPage(parent: this));
-        //   break;
         case 1:
-          updateMainWidget(TranscriptionSearchPage(parent: this));
+          updateMainWidget(TranscriptionSearchPage(parent: this),"Поиск");
           break;
-          // updateMainWidget(const FingerPrintPage());
-          // break;
-        // case 3:
-        //   updateMainWidget(const TranscriptionAnalysisWidget());
-        //   break;
         case 2:
-          updateMainWidget(const FingerPrintPage());
+          updateMainWidget(const FingerPrintPage(), "Музыка");
           break;
         case 3:
-          updateMainWidget(SettingsPage(parent: this));
+          updateMainWidget(SettingsPage(parent: this), "Настройки");
           break;
         default:
-          updateMainWidget(const RadioPage());
+          updateMainWidget(const RadioPage(),"Радио");
           break;
       }
     }
