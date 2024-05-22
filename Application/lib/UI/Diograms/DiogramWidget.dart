@@ -1,6 +1,6 @@
 import 'dart:io';
 
-
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -13,186 +13,262 @@ class TranscriptionAnalysisWidget extends StatefulWidget {
   const TranscriptionAnalysisWidget({super.key});
 
   @override
-  _TranscriptionAnalysisWidgetState createState() => _TranscriptionAnalysisWidgetState();
+  _TranscriptionAnalysisWidgetState createState() =>
+      _TranscriptionAnalysisWidgetState();
 }
 
-class _TranscriptionAnalysisWidgetState extends State<TranscriptionAnalysisWidget> {
-  List<Transcription> transcriptions = [];
+class _TranscriptionAnalysisWidgetState
+    extends State<TranscriptionAnalysisWidget> {
+  List<Transcription> _transcriptions = [];
 
   @override
   void initState() {
     super.initState();
-    getTranscriptions();
+    _fetchTranscriptions();
   }
 
-  Future<void> getTranscriptions() async {
-    transcriptions = await Api.getAllTranscriptions();
+  Future<void> _fetchTranscriptions() async {
+    final transcriptions = (await Api.getAllTranscriptions());
+
+    setState(() {
+      _transcriptions = transcriptions;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            child: SfCircularChart(
-              series: <CircularSeries>[
-                PieSeries<PieSegment, String>(
-                  dataSource: getMusicData(),
-                  xValueMapper: (PieSegment data, _) => data.radioName,
-                  yValueMapper: (PieSegment data, _) => data.recordetTime,
-                  dataLabelSettings: const DataLabelSettings(isVisible: true),
-                  dataLabelMapper: (PieSegment data, _) => data.radioName,
-                ),
-              ],
+      body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child:
+          SingleChildScrollView(
+            child: Column(
+              children: _generateGraphWidgets(),
             ),
-          ),
-          Expanded(
-            child: SfCartesianChart(
-              primaryXAxis: const CategoryAxis(),
-              primaryYAxis: const NumericAxis(),
-              series: [
-                BarSeries<TrackData, String>(
-                  dataSource: getTracksCount(transcriptions),
-                  xValueMapper: (TrackData data, _) => data.trackName,
-                  yValueMapper: (TrackData data, _) => data.count,
-                  dataLabelSettings: const DataLabelSettings(isVisible: true),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: SfCartesianChart(
-              primaryXAxis: const CategoryAxis(),
-              primaryYAxis: const NumericAxis(),
-              series:
-                  [
-                BarSeries<TrackData, String>(
-                  dataSource: TotalSegmentsOfRadiostation(transcriptions),
-                  xValueMapper: (TrackData data, _) => data.trackName,
-                  yValueMapper: (TrackData data, _) => data.count,
-                  dataLabelSettings: const DataLabelSettings(isVisible: true),
-                ),
-              ],
-            ),
-          ),
-          ElevatedButton(
-            child: const Text('Создать отчет'),
-            onPressed: () {
-              createExcelReport(getMusicData(), getTracksCount(transcriptions), TotalSegmentsOfRadiostation(transcriptions));
-            },
-          ),
-        ],
+          )
       ),
     );
   }
 
-  List<PieSegment> getMusicData() {
-    List<PieSegment> musicData = [];
-    for (var transcription in transcriptions) {
-      PieSegment segment = PieSegment();
-      segment.radioName = transcription.radioName;
-      segment.recordetTime = calculateTotalTime(transcription.segments).toInt();
-      if (musicData.any((element) => element.radioName == segment.radioName)) {
-        musicData[musicData.indexWhere((element) => element.radioName == segment.radioName)].recordetTime += segment.recordetTime;
-      } else {
-        musicData.add(segment);
-      }
-    }
-    return musicData;
-  }
+  List<Widget> _generateGraphWidgets() {
+    List<Widget> widgets = [];
 
-  double calculateTotalTime(List<RadioSegment> segments) {
-    double totalTime = 0;
-    for (var segment in segments) {
-      totalTime += segment.end - segment.start;
-    }
-    return totalTime;
-  }
+    // Bar chart for the duration of each transcription
+    final durationData = _transcriptions.map((t) => _DurationData(
+        t.radioName,
+        t.endTime.difference(t.startTime).inSeconds
+    )).toList();
 
-  List<TrackData> getTracksCount(List<Transcription> segments) {
-    List<TrackData> trackData = [];
-    for (var transcription in segments) {
-      TrackData track = TrackData();
+    widgets.add(
+      Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Text('Transcription Durations', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      ),
+    );
+    widgets.add(
+      SizedBox(
+        height: 300,
+        child: BarChart(
+          BarChartData(
+            alignment: BarChartAlignment.spaceAround,
+            barGroups: durationData
+                .map(
+                  (data) => BarChartGroupData(
+                x: durationData.indexOf(data),
+                barRods: [
+                  BarChartRodData(y: data.duration.toDouble(), colors: [Colors.blue])
+                ],
+                showingTooltipIndicators: [0],
+              ),
+            )
+                .toList(),
+            titlesData: FlTitlesData(
+              leftTitles: SideTitles(showTitles: true),
+              bottomTitles: SideTitles(
+                showTitles: true,
+                getTitles: (double value) {
+                  return durationData[value.toInt()].radioName;
+                },
+                rotateAngle: 45, // Rotating to avoid overlap if the text is long
+                margin: 20, // Adjust margin to provide enough space for the labels
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // Bar chart for the most popular tracks
+    final trackCount = <String, int>{};
+    for (var transcription in _transcriptions) {
       for (var segment in transcription.segments) {
-        String trackName = segment.trackName.toLowerCase();
-        track.trackName = trackName;
-        track.count++;
+        trackCount[segment.trackName] = (trackCount[segment.trackName] ?? 0) + 1;
       }
-      if (trackData.any((element) => element.trackName == track.trackName)) {
-        trackData[trackData.indexWhere((element) => element.trackName == track.trackName)].count += track.count;
-      } else {
-        trackData.add(track);
+    }
+    final popularTracksData = trackCount.entries.map((e) => _TrackData(e.key, e.value)).toList();
+
+    widgets.add(
+      Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Text('Popular Tracks', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      ),
+    );
+    widgets.add(
+      SizedBox(
+        height: 300,
+        child: BarChart(
+          BarChartData(
+            alignment: BarChartAlignment.spaceAround,
+            barGroups: popularTracksData
+                .map(
+                  (data) => BarChartGroupData(
+                x: popularTracksData.indexOf(data),
+                barRods: [
+                  BarChartRodData(y: data.count.toDouble(), colors: [Colors.green])
+                ],
+                showingTooltipIndicators: [0],
+              ),
+            )
+                .toList(),
+            titlesData: FlTitlesData(
+              leftTitles: SideTitles(showTitles: true),
+              bottomTitles: SideTitles(
+                showTitles: true,
+                getTitles: (double value) {
+                  return popularTracksData[value.toInt()].trackName;
+                },
+                rotateAngle: 45,
+                margin: 20,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // Bar chart for the total amount of time of news on air
+    final newsDuration = <String, int>{};
+    for (var transcription in _transcriptions) {
+      for (var news in transcription.news) {
+        final duration = (news.end ?? 0) - (news.start ?? 0);
+        newsDuration[transcription.radioName] = (newsDuration[transcription.radioName] ?? 0) + duration;
       }
-
     }
-    trackData.sort((a, b) => a.count.compareTo(b.count));
-    return trackData;
+    final newsDurationData = newsDuration.entries.map((e) => _NewsDurationData(e.key, e.value)).toList();
 
-  }
+    widgets.add(
+      Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Text('News Duration', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      ),
+    );
+    widgets.add(
+      SizedBox(
+        height: 300,
+        child: BarChart(
+          BarChartData(
+            alignment: BarChartAlignment.spaceAround,
+            barGroups: newsDurationData
+                .map(
+                  (data) => BarChartGroupData(
+                x: newsDurationData.indexOf(data),
+                barRods: [
+                  BarChartRodData(y: data.duration.toDouble(), colors: [Colors.red])
+                ],
+                showingTooltipIndicators: [0],
+              ),
+            )
+                .toList(),
+            titlesData: FlTitlesData(
+              leftTitles: SideTitles(showTitles: true),
+              bottomTitles: SideTitles(
+                showTitles: true,
+                getTitles: (double value) {
+                  return newsDurationData[value.toInt()].radioName;
+                },
+                rotateAngle: 45,
+                margin: 20,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
 
-  List<TrackData> TotalSegmentsOfRadiostation(List<Transcription> transcriptions) {
-    List<TrackData> trackData = [];
-    for (var transcription in transcriptions) {
-      TrackData track = TrackData();
-
-      track.trackName = transcription.radioName;
-      track.count = transcription.segments.length;
-
-      if (trackData.any((element) => element.trackName == track.trackName)) {
-        trackData[trackData.indexWhere((element) => element.trackName == track.trackName)].count += track.count;
-      } else {
-        trackData.add(track);
-      }
-
+    // Bar chart for the number of segments for each radio station
+    final segmentCount = <String, int>{};
+    for (var transcription in _transcriptions) {
+      segmentCount[transcription.radioName] = (segmentCount[transcription.radioName] ?? 0) + transcription.segments.length;
     }
-    trackData.sort((a, b) => a.count.compareTo(b.count));
-    return trackData;
+    final segmentCountData = segmentCount.entries.map((e) => _SegmentCountData(e.key, e.value)).toList();
 
-  }
+    widgets.add(
+      Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Text('Segment Count', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      ),
+    );
+    widgets.add(
+      SizedBox(
+        height: 300,
+        child: BarChart(
+          BarChartData(
+            alignment: BarChartAlignment.spaceAround,
+            barGroups: segmentCountData
+                .map(
+                  (data) => BarChartGroupData(
+                x: segmentCountData.indexOf(data),
+                barRods: [
+                  BarChartRodData(y: data.count.toDouble(), colors: [Colors.purple])
+                ],
+                showingTooltipIndicators: [0],
+              ),
+            )
+                .toList(),
+            titlesData: FlTitlesData(
+              leftTitles: SideTitles(showTitles: true),
+              bottomTitles: SideTitles(
+                showTitles: true,
+                getTitles: (double value) {
+                  return segmentCountData[value.toInt()].radioName;
+                },
+                rotateAngle: 45,
+                margin: 20,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
 
-  void createExcelReport(List<PieSegment> pieData, List<TrackData> barData1, List<TrackData> barData2) async {
-    var excel = Excel.createExcel();
-
-    // Create a sheet for pie chart data
-    var sheetPie = excel['PieData'];
-    sheetPie.appendRow([toCellValue('Radio Name'), toCellValue('Recorded Time')]);
-    for (var data in pieData) {
-      sheetPie.appendRow([toCellValue(data.radioName), toCellValue(data.recordetTime)]) ;
-    }
-
-    // Create a sheet for bar chart data 1
-    var sheetBar1 = excel['BarData1'];
-    sheetBar1.appendRow([toCellValue('Track Name'), toCellValue('Count')]);
-    for (var data in barData1) {
-      sheetBar1.appendRow([toCellValue(data.trackName), toCellValue(data.count)]);
-    }
-
-    // Create a sheet for bar chart data 2
-    var sheetBar2 = excel['BarData2'];
-    sheetBar2.appendRow([toCellValue('Track Name'), toCellValue('Count')]);
-    for (var data in barData2) {
-      sheetBar2.appendRow([toCellValue(data.trackName), toCellValue(data.count)]);
-    }
-
-    // Save the Excel file
-    var bytes = excel.encode();
-    final documentDirectory = await getApplicationDocumentsDirectory();
-    final file = File('${documentDirectory.path}/report.xlsx');
-    await file.writeAsBytes(bytes!);
-  }
-
-  TextCellValue toCellValue(dynamic value) {
-    return TextCellValue(value.toString());
+    return widgets;
   }
 }
 
-class PieSegment{
-  String radioName = "";
-  int recordetTime = 0;
+class _DurationData {
+  final String radioName;
+  final int duration;
+
+  _DurationData(this.radioName, this.duration);
 }
 
-class TrackData{
-  String trackName = "";
-  int count = 0;
+class _TrackData {
+  final String trackName;
+  final int count;
+
+  _TrackData(this.trackName, this.count);
+}
+
+class _NewsDurationData {
+  final String radioName;
+  final int duration;
+
+  _NewsDurationData(this.radioName, this.duration);
+}
+
+class _SegmentCountData {
+  final String radioName;
+  final int count;
+
+  _SegmentCountData(this.radioName, this.count);
 }

@@ -1,7 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'Settings.dart';
 import 'UI/AudioWidgets/AudioPage.dart';
+import 'UI/Diograms/DiogramWidget.dart';
 import 'UI/FingerPrintWidgets/FingerPrintPage.dart';
 import 'UI/RadioWidgets/RadioPage.dart';
 import 'UI/SearchWidgets/SearchPage.dart';
@@ -66,7 +66,8 @@ class MyHomePageState extends State<MyHomePage> {
               child: DrawerHeader(
                 decoration: BoxDecoration(
                   color: Colors.blue,
-                ), child: null,
+                ),
+                child: null,
               ),
             ),
             ListTile(
@@ -103,6 +104,17 @@ class MyHomePageState extends State<MyHomePage> {
               },
             ),
             ListTile(
+              leading: Icon(Icons.analytics),
+              title: Text('Статистика'),
+              onTap: () {
+                setState(() {
+                  selectedIndex = 4;
+                  updatePage(null);
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
               leading: Icon(Icons.settings),
               title: Text('Настройки'),
               onTap: () {
@@ -126,10 +138,10 @@ class MyHomePageState extends State<MyHomePage> {
     } else {
       switch (selectedIndex) {
         case 0:
-          updateMainWidget(const RadioPage(),"Радио");
+          updateMainWidget(const RadioPage(), "Радио");
           break;
         case 1:
-          updateMainWidget(TranscriptionSearchPage(parent: this),"Поиск");
+          updateMainWidget(TranscriptionSearchPage(parent: this), "Поиск");
           break;
         case 2:
           updateMainWidget(const FingerPrintPage(), "Музыка");
@@ -137,8 +149,11 @@ class MyHomePageState extends State<MyHomePage> {
         case 3:
           updateMainWidget(SettingsPage(parent: this), "Настройки");
           break;
+        case 4:
+          updateMainWidget(TranscriptionAnalysisWidget(), "Статистика");
+          break;
         default:
-          updateMainWidget(const RadioPage(),"Радио");
+          updateMainWidget(const RadioPage(), "Радио");
           break;
       }
     }
