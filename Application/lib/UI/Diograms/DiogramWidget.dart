@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ class TranscriptionAnalysisWidget extends StatefulWidget {
 class _TranscriptionAnalysisWidgetState
     extends State<TranscriptionAnalysisWidget> {
   List<Transcription> _transcriptions = [];
+  int pieTouchedIndex = -1;
 
   @override
   void initState() {
@@ -40,13 +42,11 @@ class _TranscriptionAnalysisWidgetState
     return Scaffold(
       body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child:
-          SingleChildScrollView(
+          child: SingleChildScrollView(
             child: Column(
               children: _generateGraphWidgets(),
             ),
-          )
-      ),
+          )),
     );
   }
 
@@ -54,194 +54,332 @@ class _TranscriptionAnalysisWidgetState
     List<Widget> widgets = [];
 
     // Bar chart for the duration of each transcription
-    final durationData = _transcriptions.map((t) => _DurationData(
-        t.radioName,
-        t.endTime.difference(t.startTime).inSeconds
-    )).toList();
-
     widgets.add(
-      Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Text('Transcription Durations', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      const Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Text('Transcription Durations',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
       ),
     );
     widgets.add(
       SizedBox(
         height: 300,
-        child: BarChart(
-          BarChartData(
-            alignment: BarChartAlignment.spaceAround,
-            barGroups: durationData
-                .map(
-                  (data) => BarChartGroupData(
-                x: durationData.indexOf(data),
-                barRods: [
-                  BarChartRodData(y: data.duration.toDouble(), colors: [Colors.blue])
-                ],
-                showingTooltipIndicators: [0],
-              ),
-            )
-                .toList(),
-            titlesData: FlTitlesData(
-              leftTitles: SideTitles(showTitles: true),
-              bottomTitles: SideTitles(
-                showTitles: true,
-                getTitles: (double value) {
-                  return durationData[value.toInt()].radioName;
-                },
-                rotateAngle: 45, // Rotating to avoid overlap if the text is long
-                margin: 20, // Adjust margin to provide enough space for the labels
-              ),
-            ),
-          ),
-        ),
+        child: transcriptionDurationsWidget(),
       ),
     );
 
-    // Bar chart for the most popular tracks
-    final trackCount = <String, int>{};
-    for (var transcription in _transcriptions) {
-      for (var segment in transcription.segments) {
-        trackCount[segment.trackName] = (trackCount[segment.trackName] ?? 0) + 1;
-      }
-    }
-    final popularTracksData = trackCount.entries.map((e) => _TrackData(e.key, e.value)).toList();
-
     widgets.add(
-      Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Text('Popular Tracks', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      const Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Text('Popular Tracks',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
       ),
     );
     widgets.add(
       SizedBox(
         height: 300,
-        child: BarChart(
-          BarChartData(
-            alignment: BarChartAlignment.spaceAround,
-            barGroups: popularTracksData
-                .map(
-                  (data) => BarChartGroupData(
-                x: popularTracksData.indexOf(data),
-                barRods: [
-                  BarChartRodData(y: data.count.toDouble(), colors: [Colors.green])
-                ],
-                showingTooltipIndicators: [0],
-              ),
-            )
-                .toList(),
-            titlesData: FlTitlesData(
-              leftTitles: SideTitles(showTitles: true),
-              bottomTitles: SideTitles(
-                showTitles: true,
-                getTitles: (double value) {
-                  return popularTracksData[value.toInt()].trackName;
-                },
-                rotateAngle: 45,
-                margin: 20,
-              ),
-            ),
-          ),
-        ),
+        child: trackCountWidget(),
       ),
     );
 
-    // Bar chart for the total amount of time of news on air
-    final newsDuration = <String, int>{};
-    for (var transcription in _transcriptions) {
-      for (var news in transcription.news) {
-        final duration = (news.end ?? 0) - (news.start ?? 0);
-        newsDuration[transcription.radioName] = (newsDuration[transcription.radioName] ?? 0) + duration;
-      }
-    }
-    final newsDurationData = newsDuration.entries.map((e) => _NewsDurationData(e.key, e.value)).toList();
-
     widgets.add(
-      Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Text('News Duration', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      const Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Text('News Duration',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
       ),
     );
     widgets.add(
       SizedBox(
         height: 300,
-        child: BarChart(
-          BarChartData(
-            alignment: BarChartAlignment.spaceAround,
-            barGroups: newsDurationData
-                .map(
-                  (data) => BarChartGroupData(
-                x: newsDurationData.indexOf(data),
-                barRods: [
-                  BarChartRodData(y: data.duration.toDouble(), colors: [Colors.red])
-                ],
-                showingTooltipIndicators: [0],
-              ),
-            )
-                .toList(),
-            titlesData: FlTitlesData(
-              leftTitles: SideTitles(showTitles: true),
-              bottomTitles: SideTitles(
-                showTitles: true,
-                getTitles: (double value) {
-                  return newsDurationData[value.toInt()].radioName;
-                },
-                rotateAngle: 45,
-                margin: 20,
-              ),
-            ),
-          ),
-        ),
+        child: newsDurationWidget(),
       ),
     );
 
-    // Bar chart for the number of segments for each radio station
-    final segmentCount = <String, int>{};
-    for (var transcription in _transcriptions) {
-      segmentCount[transcription.radioName] = (segmentCount[transcription.radioName] ?? 0) + transcription.segments.length;
-    }
-    final segmentCountData = segmentCount.entries.map((e) => _SegmentCountData(e.key, e.value)).toList();
-
     widgets.add(
-      Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Text('Segment Count', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      const Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Text('Segment Count',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
       ),
     );
     widgets.add(
       SizedBox(
         height: 300,
-        child: BarChart(
-          BarChartData(
-            alignment: BarChartAlignment.spaceAround,
-            barGroups: segmentCountData
-                .map(
-                  (data) => BarChartGroupData(
-                x: segmentCountData.indexOf(data),
-                barRods: [
-                  BarChartRodData(y: data.count.toDouble(), colors: [Colors.purple])
-                ],
-                showingTooltipIndicators: [0],
-              ),
-            )
-                .toList(),
-            titlesData: FlTitlesData(
-              leftTitles: SideTitles(showTitles: true),
-              bottomTitles: SideTitles(
-                showTitles: true,
-                getTitles: (double value) {
-                  return segmentCountData[value.toInt()].radioName;
-                },
-                rotateAngle: 45,
-                margin: 20,
-              ),
-            ),
-          ),
-        ),
+        child: segmentsCountWidget(),
       ),
     );
 
     return widgets;
+  }
+
+  // BarChart transcriptionDurationsWidget() {
+  //   var durationData = _transcriptions
+  //       .map((t) =>
+  //       _DurationData(
+  //           t.radioName, t.endTime
+  //           .difference(t.startTime)
+  //           .inSeconds))
+  //       .toList();
+  //
+  //   final durationDataSummarized = <String, int>{};
+  //   for (var data in durationData) {
+  //     durationDataSummarized[data.radioName] =
+  //         (durationDataSummarized[data.radioName] ?? 0) + data.duration;
+  //
+  //   }
+  //
+  //   durationData = durationDataSummarized.entries
+  //       .map((e) => _DurationData(e.key, e.value))
+  //       .toList();
+  //
+  //
+  //   return BarChart(
+  //     BarChartData(
+  //       alignment: BarChartAlignment.spaceAround,
+  //       barGroups: durationData
+  //           .map(
+  //             (data) =>
+  //             BarChartGroupData(
+  //               x: durationData.indexOf(data),
+  //               barRods: [
+  //                 BarChartRodData(
+  //                     toY: data.duration.toDouble()/60, color: Colors.blue)
+  //               ],
+  //               showingTooltipIndicators: [0],
+  //             ),
+  //       )
+  //           .toList(),
+  //       titlesData: FlTitlesData(
+  //           leftTitles: const AxisTitles(
+  //             sideTitles: SideTitles(
+  //               showTitles: false,
+  //             ),
+  //           ),
+  //           bottomTitles: AxisTitles(
+  //             sideTitles: SideTitles(
+  //               showTitles: true,
+  //               getTitlesWidget: (double value, TitleMeta meta) {
+  //                 return SideTitleWidget(
+  //                     axisSide: meta.axisSide,
+  //                     space: 4,
+  //                     child: Text(durationData[value.toInt()].radioName,
+  //                         style: const TextStyle(
+  //                             fontSize: 16, fontWeight: FontWeight.bold)));
+  //               },
+  //               reservedSize: 22,
+  //             ),
+  //           )),
+  //     ),
+  //   );
+  // }
+
+  AspectRatio transcriptionDurationsWidget() {
+    var durationData = _transcriptions
+        .map((t) => _DurationData(
+            t.radioName, t.endTime.difference(t.startTime).inSeconds))
+        .toList();
+
+    final durationDataSummarized = <String, int>{};
+    for (var data in durationData) {
+      durationDataSummarized[data.radioName] =
+          (durationDataSummarized[data.radioName] ?? 0) + data.duration;
+    }
+
+    durationData = durationDataSummarized.entries
+        .map((e) => _DurationData(e.key, e.value))
+        .toList();
+
+    List<PieChartSectionData> pieChartSectionDataList =
+        durationData.map((data) {
+      const isTouched = false;
+      const double fontSize = isTouched ? 25 : 16;
+      const double radius = isTouched ? 60 : 50;
+      final value = data.duration.toDouble();
+
+      return PieChartSectionData(
+        color: getRandomColor(),
+        value: value,
+        title: data.radioName,
+        radius: radius,
+        titleStyle: const TextStyle(
+            fontSize: fontSize,
+            fontWeight: FontWeight.bold,
+            color: Colors.black),
+      );
+    }).toList();
+
+    return AspectRatio(
+        aspectRatio: 1.3,
+        child: AspectRatio(
+            aspectRatio: 1,
+            child: PieChart(
+              PieChartData(
+                sectionsSpace: 0,
+                centerSpaceRadius: 40,
+                sections: pieChartSectionDataList,
+              ),
+            )));
+  }
+
+  BarChart trackCountWidget() {
+    // Bar chart for the most popular tracks
+    final trackCount = <String, int>{};
+    for (var transcription in _transcriptions) {
+      for (var segment in transcription.segments) {
+        trackCount[segment.trackName] =
+            (trackCount[segment.trackName] ?? 0) + 1;
+      }
+    }
+    var popularTracksData =
+        trackCount.entries.map((e) => _TrackData(e.key, e.value)).toList();
+
+    //get top 10
+    popularTracksData.sort((a, b) => b.count.compareTo(a.count));
+    if (popularTracksData.length > 10) {
+      popularTracksData = popularTracksData.sublist(0, 10);
+    }
+
+    return BarChart(
+      BarChartData(
+        alignment: BarChartAlignment.spaceAround,
+        barGroups: popularTracksData
+            .map(
+              (data) => BarChartGroupData(
+                x: popularTracksData.indexOf(data),
+                barRods: [
+                  BarChartRodData(
+                      toY: data.count.toDouble(), color: Colors.green)
+                ],
+                showingTooltipIndicators: [0],
+              ),
+            )
+            .toList(),
+        titlesData: FlTitlesData(
+            leftTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (double value, TitleMeta meta) {
+                  return SideTitleWidget(
+                      axisSide: meta.axisSide,
+                      space: 4,
+                      child: Text(popularTracksData[value.toInt()].trackName,
+                          style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold)));
+                },
+                reservedSize: 22,
+              ),
+            )),
+      ),
+    );
+  }
+
+  BarChart newsDurationWidget() {
+    final newsDuration = <String, int>{};
+    for (var transcription in _transcriptions) {
+      for (var news in transcription.news) {
+        final duration = (news.end ?? 0) - (news.start ?? 0);
+        newsDuration[transcription.radioName] =
+            (newsDuration[transcription.radioName] ?? 0) + duration;
+      }
+    }
+    final newsDurationData = newsDuration.entries
+        .map((e) => _NewsDurationData(e.key, e.value))
+        .toList();
+
+    return BarChart(
+      BarChartData(
+        alignment: BarChartAlignment.spaceAround,
+        barGroups: newsDurationData
+            .map(
+              (data) => BarChartGroupData(
+                x: newsDurationData.indexOf(data),
+                barRods: [
+                  BarChartRodData(
+                      toY: data.duration.toDouble(), color: Colors.red)
+                ],
+                showingTooltipIndicators: [0],
+              ),
+            )
+            .toList(),
+        titlesData: FlTitlesData(
+          leftTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              getTitlesWidget: (double value, TitleMeta meta) {
+                return SideTitleWidget(
+                    axisSide: meta.axisSide,
+                    space: 4,
+                    child: Text(newsDurationData[value.toInt()].radioName,
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold)));
+              },
+              reservedSize: 22,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  BarChart segmentsCountWidget() {
+    // Bar chart for the number of segments for each radio station
+    final segmentCount = <String, int>{};
+    for (var transcription in _transcriptions) {
+      segmentCount[transcription.radioName] =
+          (segmentCount[transcription.radioName] ?? 0) +
+              transcription.segments.length;
+    }
+    final segmentCountData = segmentCount.entries
+        .map((e) => _SegmentCountData(e.key, e.value))
+        .toList();
+
+    return BarChart(
+      BarChartData(
+        alignment: BarChartAlignment.spaceAround,
+        barGroups: segmentCountData
+            .map(
+              (data) => BarChartGroupData(
+                x: segmentCountData.indexOf(data),
+                barRods: [
+                  BarChartRodData(
+                      toY: data.count.toDouble(), color: Colors.purple)
+                ],
+                showingTooltipIndicators: [0],
+              ),
+            )
+            .toList(),
+        titlesData: FlTitlesData(
+          leftTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              getTitlesWidget: (double value, TitleMeta meta) {
+                return SideTitleWidget(
+                    axisSide: meta.axisSide,
+                    space: 4,
+                    child: Text(segmentCountData[value.toInt()].radioName,
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold)));
+              },
+              reservedSize: 22,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  getRandomColor() {
+    return Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0);
   }
 }
 
