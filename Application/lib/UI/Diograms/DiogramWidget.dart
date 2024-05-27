@@ -1,11 +1,7 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:excel/excel.dart';
 
 import '../../Api.dart';
 import '../../DataClasses/Transcription.dart';

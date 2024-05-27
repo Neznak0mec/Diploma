@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'Settings.dart';
-import 'UI/AudioWidgets/AudioPage.dart';
 import 'UI/Diograms/DiogramWidget.dart';
 import 'UI/FingerPrintWidgets/FingerPrintPage.dart';
 import 'UI/RadioWidgets/RadioPage.dart';
@@ -71,8 +70,8 @@ class MyHomePageState extends State<MyHomePage> {
               ),
             ),
             ListTile(
-              leading: Icon(Icons.radio),
-              title: Text('Радио'),
+              leading: const Icon(Icons.radio),
+              title: const Text('Радио'),
               onTap: () {
                 setState(() {
                   selectedIndex = 0;
@@ -82,8 +81,8 @@ class MyHomePageState extends State<MyHomePage> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.search),
-              title: Text('Поиск'),
+              leading: const Icon(Icons.search),
+              title: const Text('Поиск'),
               onTap: () {
                 setState(() {
                   selectedIndex = 1;
@@ -93,8 +92,8 @@ class MyHomePageState extends State<MyHomePage> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.music_note),
-              title: Text('Музыка'),
+              leading: const Icon(Icons.music_note),
+              title: const Text('Музыка'),
               onTap: () {
                 setState(() {
                   selectedIndex = 2;
@@ -104,8 +103,8 @@ class MyHomePageState extends State<MyHomePage> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.analytics),
-              title: Text('Статистика'),
+              leading: const Icon(Icons.analytics),
+              title: const Text('Статистика'),
               onTap: () {
                 setState(() {
                   selectedIndex = 4;
@@ -115,8 +114,8 @@ class MyHomePageState extends State<MyHomePage> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Настройки'),
+              leading: const Icon(Icons.settings),
+              title: const Text('Настройки'),
               onTap: () {
                 setState(() {
                   selectedIndex = 3;
@@ -150,7 +149,7 @@ class MyHomePageState extends State<MyHomePage> {
           updateMainWidget(SettingsPage(parent: this), "Настройки");
           break;
         case 4:
-          updateMainWidget(TranscriptionAnalysisWidget(), "Статистика");
+          updateMainWidget(const TranscriptionAnalysisWidget(), "Статистика");
           break;
         default:
           updateMainWidget(const RadioPage(), "Радио");

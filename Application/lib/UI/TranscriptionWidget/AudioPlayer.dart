@@ -20,8 +20,8 @@ class AudioPlayerPage extends StatefulWidget {
 
 class _AudioPlayerPageState extends State<AudioPlayerPage> {
   // late AudioPlayer audioPlayer;
-  Duration _duration = const Duration();
-  Duration _position = const Duration();
+  final Duration _duration = const Duration();
+  final Duration _position = const Duration();
   bool isPlaying = false;
   bool isLoading = false;
   String? localFilePath;
