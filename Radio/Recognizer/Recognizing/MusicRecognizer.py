@@ -3,14 +3,16 @@ import asyncio
 from pydub import AudioSegment
 from shazamio import Shazam
 
+from config import *
 from dejavu import Dejavu
 from dejavu.logic.recognizer.segment_recognizer import SegmentRecognizer
 
 config = {
     'database': {
-        "host": "localhost",
-        "user": "user",
-        "password": "password",
+        "host": database_host,
+        "user": database_user,
+        "password": database_password,
+        "port": database_port,
         "database": "dejavu"},
     "database_type": "postgres"}
 

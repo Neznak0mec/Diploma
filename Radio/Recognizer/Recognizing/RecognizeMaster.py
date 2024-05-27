@@ -3,12 +3,14 @@ import datetime
 import json
 from asyncio import Task
 
+import aiohttp
 import requests
 from pydub import AudioSegment
 
 from Recognizing.FindMaster import FindMaster
 from Recognizing.MusicRecognizer import LocalMusicRecognizer, NetworkMusicRecognizer
 from Recognizing.TextRecognizer import TextRecognizer
+from config import API_URL
 from database.DataBase import DataBase
 from database.Models.RecordTranscription import RecordTranscription, RadioSegment, TextSegment
 from database.Models.TranscriptionTask import TranscriptionTaskStatus, Audio
@@ -54,7 +56,15 @@ class RecognizeMaster:
     async def fingerprint_songs(self, fingerprint_tasks: list):
         i: Audio
         for i in fingerprint_tasks:
-            path = f"../AudioCaptureServer/FingerPrint/{i.file_name}"
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"{API_URL}/fingerprint/file/{i.file_name}") as resp:
+                    file = await resp.read()
+
+            # Save the file in temp directory
+            with open(f"temp/{i.file_name}", 'wb') as fp:
+                fp.write(file)
+
+            path = f"temp/{i.file_name}"
             await self.local_sound_recognizer.fingerprint_file(path, i.radio_name)
             self.db.Tasks.update_task(i.file_name, TranscriptionTaskStatus.fingerprinted)
             self.transcribing.remove(i.file_name)
@@ -63,7 +73,16 @@ class RecognizeMaster:
         task: Audio
         for task in tasks:
             print(f"start recognizing {task.file_name}")
-            audio_path = f"../AudioCaptureServer/records/{task.folder}/{task.file_name}"
+            # audio_path = f"../AudioCaptureServer/records/{task.folder}/{task.file_name}"
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"{API_URL}/audio/file/{task.file_name}") as resp:
+                    file = await resp.read()
+
+            # Save the file in temp directory
+            with open(f"temp/{task.file_name}", 'wb') as fp:
+                fp.write(file)
+
+            audio_path = f"temp/{task.file_name}"
 
             audio = AudioSegment.from_file(audio_path)
 
@@ -118,7 +137,7 @@ class RecognizeMaster:
                         previous_segment.end_time = radio_segment.end_time
                         previous_segment.text += radio_segment.text
                         previous_segment.text_segments += radio_segment.text_segments
-                    
+
                     else:
                         segments.append(radio_segment)
 

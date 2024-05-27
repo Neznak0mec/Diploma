@@ -1,0 +1,5 @@
+API_URL = "http://localhost:5020"
+database_host = "localhost"
+database_port = "5432"
+database_user = "user"
+database_password = "password"

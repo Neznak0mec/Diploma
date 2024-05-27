@@ -1,5 +1,5 @@
 import numpy as np
-import torch
+# import torch
 import whisper
 from pydub import AudioSegment
 
@@ -21,7 +21,7 @@ class TextRecognizer:
         arr = np.array(segment.get_array_of_samples())
         arr = arr.astype(np.float32) / 32768.0
 
-        result = self.model.transcribe(arr, fp16=torch.cuda.is_available())
+        result = self.model.transcribe(arr, fp16=False)
 
         segments = []
 
