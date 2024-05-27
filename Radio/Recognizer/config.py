@@ -1,5 +1,5 @@
-API_URL = "http://localhost:5020"
-database_host = "localhost"
+API_URL = "http://audiocaptureserver:80/api"
+database_host = "postgres"
 database_port = "5432"
 database_user = "user"
 database_password = "password"

@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import json
+import os
 from asyncio import Task
 
 import aiohttp
@@ -53,18 +54,23 @@ class RecognizeMaster:
 
             await asyncio.sleep(60)
 
+    async def download_file(self, filename: str) -> str:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"{API_URL}/fingerprint/file/{filename}") as resp:
+                file = await resp.read()
+
+        os.makedirs("temp", exist_ok=True)
+
+        # Save the file in temp directory
+        with open(f"temp/{filename}", 'wb') as fp:
+            fp.write(file)
+
+        return f"temp/{filename}"
+
     async def fingerprint_songs(self, fingerprint_tasks: list):
         i: Audio
         for i in fingerprint_tasks:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(f"{API_URL}/fingerprint/file/{i.file_name}") as resp:
-                    file = await resp.read()
-
-            # Save the file in temp directory
-            with open(f"temp/{i.file_name}", 'wb') as fp:
-                fp.write(file)
-
-            path = f"temp/{i.file_name}"
+            path = await self.download_file(i.file_name)
             await self.local_sound_recognizer.fingerprint_file(path, i.radio_name)
             self.db.Tasks.update_task(i.file_name, TranscriptionTaskStatus.fingerprinted)
             self.transcribing.remove(i.file_name)
@@ -73,16 +79,8 @@ class RecognizeMaster:
         task: Audio
         for task in tasks:
             print(f"start recognizing {task.file_name}")
-            # audio_path = f"../AudioCaptureServer/records/{task.folder}/{task.file_name}"
-            async with aiohttp.ClientSession() as session:
-                async with session.get(f"{API_URL}/audio/file/{task.file_name}") as resp:
-                    file = await resp.read()
 
-            # Save the file in temp directory
-            with open(f"temp/{task.file_name}", 'wb') as fp:
-                fp.write(file)
-
-            audio_path = f"temp/{task.file_name}"
+            audio_path = await self.download_file(task.file_name)
 
             audio = AudioSegment.from_file(audio_path)
 
@@ -163,3 +161,5 @@ class RecognizeMaster:
             self.db.RecordTranscription.insert(record)
             self.db.Tasks.update_task(record.fileName, TranscriptionTaskStatus.transcribed)
             self.transcribing.remove(record.fileName)
+
+            os.remove(audio_path)

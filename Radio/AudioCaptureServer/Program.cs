@@ -20,7 +20,7 @@ class Programm
     static void RunRadio(DataBase.MyDataBase myDataBase, RadioMaster radioMaster)
     {
         //todo
-//          radioMaster.Start();
+          radioMaster.Start();
     }
 
     static void RunAPI(DataBase.MyDataBase myDataBase, RadioMaster radioMaster)

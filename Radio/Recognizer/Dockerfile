@@ -1,6 +1,10 @@
 # Use an official Python runtime as a parent image
 FROM python:3.10-slim-buster
 
+RUN apt-get update \
+&& apt-get -y install libpq-dev gcc ffmpeg \
+&& pip install psycopg2
+
 # Set the working directory in the container to /app
 WORKDIR /app
 
@@ -14,4 +18,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 8000
 
 # Run app.py when the container launches
-CMD ["python", "app.py"]
+CMD ["python", "main.py"]

@@ -6,7 +6,7 @@ from pydub import AudioSegment
 
 class TextRecognizer:
     def __init__(self):
-        self.model = whisper.load_model("tiny") #маленькая модель
+        self.model = whisper.load_model("medium") #маленькая модель
         #self.model = whisper.load_model("large")#большие модели
         # self.model = whisper.load_model("large-v2")
 
