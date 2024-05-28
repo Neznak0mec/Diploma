@@ -3,6 +3,7 @@ import 'dart:io';
 
 
 // import 'package:audioplayers/audioplayers.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -19,9 +20,9 @@ class AudioPlayerPage extends StatefulWidget {
 }
 
 class _AudioPlayerPageState extends State<AudioPlayerPage> {
-  // late AudioPlayer audioPlayer;
-  final Duration _duration = const Duration();
-  final Duration _position = const Duration();
+  late AudioPlayer audioPlayer;
+  Duration _duration = const Duration();
+  Duration _position = const Duration();
   bool isPlaying = false;
   bool isLoading = false;
   String? localFilePath;
@@ -30,22 +31,22 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
   @override
   void initState() {
     super.initState();
-    // audioPlayer = AudioPlayer();
-    // audioPlayer.onDurationChanged.listen((Duration duration) {
-    //   setState(() {
-    //     _duration = duration;
-    //   });
-    // });
-    // audioPlayer.onPositionChanged.listen((Duration position) {
-    //   setState(() {
-    //     _position = position;
-    //   });
-    // });
+    audioPlayer = AudioPlayer();
+    audioPlayer.onDurationChanged.listen((Duration duration) {
+      setState(() {
+        _duration = duration;
+      });
+    });
+    audioPlayer.onPositionChanged.listen((Duration position) {
+      setState(() {
+        _position = position;
+      });
+    });
   }
 
   @override
   void dispose() {
-    // audioPlayer.dispose();
+    audioPlayer.dispose();
     _debounce?.cancel();
 
     super.dispose();

@@ -21,6 +21,21 @@ class Api {
     }
   }
 
+  static Future<bool> isAudioStream(String url) async {
+    try {
+      final response = await http.head(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final contentType = response.headers['content-type'];
+        if (contentType != null) {
+          return contentType.startsWith('audio/');
+        }
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+    return false;
+  }
+
   ///////////////////////////////
   // Radio
   ///////////////////////////////

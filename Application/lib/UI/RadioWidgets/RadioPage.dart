@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../Api.dart';
 import '../DefaultWidgets/ErrPage.dart';
 import 'RadioForm.dart';
@@ -13,6 +14,7 @@ class RadioPage extends StatefulWidget {
 
 class RadioPageState extends State<RadioPage> {
   Future<List<ShowRadioWidget>>? radiosFuture;
+  final PanelController _panelController = PanelController();
 
   @override
   void initState() {
@@ -42,18 +44,48 @@ class RadioPageState extends State<RadioPage> {
           } else {
             List<Widget> radios = [];
             radios += snapshot.data!.cast<RadioWidget>();
-            radios.add(AddRadioForm(this));
+            // radios.add(AddRadioForm(this));
 
             return MaterialApp(
               home: Scaffold(
                 body: Padding(
                   padding: const EdgeInsets.all(20.0),
-                  child: GridView.count(
-                      crossAxisCount: _calculateCrossAxisCount(context),
-                      crossAxisSpacing: 40.0,
-                      mainAxisSpacing: 40.0,
-                      childAspectRatio: 5,
-                      children: radios),
+                  child: Stack(
+                    children: [
+                      GridView.count(
+                        crossAxisCount: _calculateCrossAxisCount(context),
+                        crossAxisSpacing: 40.0,
+                        mainAxisSpacing: 40.0,
+                        childAspectRatio: 5,
+                        children: radios,
+                      ),
+                      SlidingUpPanel(
+                        controller: _panelController,
+                        panel: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // Text("Add your widget here"),
+                              AddRadioForm(this),
+                            ],
+                          ),
+                        ),
+                        minHeight: 0,
+                        maxHeight: 200,
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                      ),
+                    ],
+                  ),
+                ),
+                floatingActionButton: FloatingActionButton(
+                  onPressed: () {
+                    if (_panelController.isPanelClosed) {
+                      _panelController.open();
+                    } else {
+                      _panelController.close();
+                    }
+                  },
+                  child: Icon(Icons.add),
                 ),
               ),
             );
@@ -74,7 +106,7 @@ class RadioPageState extends State<RadioPage> {
     const itemWidth = 400;
     const spacing = 20.0;
     final crossAxisCount =
-        ((screenWidth - spacing) / (itemWidth + spacing)).floor();
+    ((screenWidth - spacing) / (itemWidth + spacing)).floor();
     return crossAxisCount;
   }
 
