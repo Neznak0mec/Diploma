@@ -1,3 +1,4 @@
+import 'package:abiba/UI/SnackBars/FlashMessageSuccess.dart';
 import 'package:flutter/material.dart';
 import '../../Api.dart';
 import '../SnackBars/FlashMessageError.dart';
@@ -100,12 +101,21 @@ class _AddRadioFormState extends State<AddRadioForm> {
                             );
                           }
                         } else {
-                          // curl -X POST \
-                          // -H 'Content-Type: application/json' \
-                          // -d '{"chat_id": "123456789", "text": "This is a test from curl", "disable_notification": true}' \
-                          // https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage
-                          // code to send request to add
-                          await Api.sendRequestToAdd(name, url);
+                          if (await Api.sendRequestToAdd(name, url)) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              FlashMessageSuccess(
+                                "Запрос на добавление отправлен",
+                                context,
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              FlashMessageError(
+                                "Ошибка при отправке запроса",
+                                context,
+                              ),
+                            );
+                          }
                         }
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
