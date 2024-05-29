@@ -1,6 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:requests/requests.dart';
-import "package:http/http.dart" as http;
+import 'package:http/http.dart' as http;
 
 import 'DataClasses/Audio.dart';
 import 'DataClasses/Radio.dart';
@@ -43,23 +45,21 @@ class Api {
     try {
       String telegramBotToken = '6543542035:AAEqmMA6vIKhceTTPp--eBA2qmR-j6gYDSQ';
 
-      String url = 'https://api.telegram.org/bot$telegramBotToken/sendMessage?chat_id=464151751';
+      String url = 'https://api.telegram.org/bot$telegramBotToken/sendMessage';
 
       Map<String, dynamic> data = {
         'chat_id': '464151751',
         'text': 'Want to add $radioName - $radioUrl',
       };
 
-      var response = await Requests.post(
-        url,
-        body: data,
-        headers: {'Content-Type': 'application/json'},
-      );
+      var response = await http.post(Uri.parse(url),
+          body: data.map((k, v) => MapEntry(k, '$v')));
 
       if (response.statusCode == 200) {
         if (kDebugMode) {
           print('Message sent successfully');
         }
+        return true;
       } else {
         if (kDebugMode) {
           print('Failed to send message: ${response.statusCode} ${response.body}');
