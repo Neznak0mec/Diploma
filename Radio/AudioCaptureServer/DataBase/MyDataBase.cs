@@ -40,7 +40,7 @@ public sealed class MyDataBase : DbContext
         try
         {
             connection =
-                new NpgsqlConnection("Host=postgres;Port=5432;Database=radio;Username=user;Password=password");
+                new NpgsqlConnection("Host=postgres;Port=5432;Database=radio;Username=megaUserToNotBeHacked;Password=password");
         }
         catch (Exception e)
         {
@@ -61,6 +61,6 @@ public sealed class MyDataBase : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-        optionsBuilder.UseNpgsql("Host=postgres;Port=5432;Database=radio;Username=user;Password=password");
+        optionsBuilder.UseNpgsql("Host=postgres;Port=5432;Database=radio;Username=megaUserToNotBeHacked;Password=password");
     }
 }

@@ -25,7 +25,7 @@ public class FingerPrintController : ControllerBase {
         if (audio == null)
             return NotFound("File not found");
 
-        var filePath = $"{audio.folderName}/{audio.fileName}";
+        var filePath = $"records/{audio.folderName}/{audio.fileName}";
 
         if (!System.IO.File.Exists(filePath))
         {

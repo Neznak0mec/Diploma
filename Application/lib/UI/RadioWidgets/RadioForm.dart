@@ -100,7 +100,12 @@ class _AddRadioFormState extends State<AddRadioForm> {
                             );
                           }
                         } else {
+                          // curl -X POST \
+                          // -H 'Content-Type: application/json' \
+                          // -d '{"chat_id": "123456789", "text": "This is a test from curl", "disable_notification": true}' \
+                          // https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage
                           // code to send request to add
+                          await Api.sendRequestToAdd(name, url);
                         }
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(

@@ -54,7 +54,7 @@ class _TranscriptionSearchPageState extends State<TranscriptionSearchPage> {
   }
 
   Future<void> _filterResults() async {
-    List<MyAudio> audios = await Api.SearchAudios(
+    List<MyAudio> audios = await Api.searchAudios(
       _selectedRadioName,
       _musicController.text,
       _phraseController.text,

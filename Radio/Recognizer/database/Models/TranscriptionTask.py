@@ -5,12 +5,15 @@ from enum import Enum
 class TranscriptionTaskStatus(Enum):
     queued_for_transcription = 0
     transcribed = 1
+    transcribing = 2
 
     queued_for_fingerprint = 10
     fingerprinted = 11
+    fingerprinting = 12
 
     queued_for_fingerprint_jingle = 20
     fingerprinted_jingle = 21
+    fingerprinting_jingle = 22
 
 
 class Audio:

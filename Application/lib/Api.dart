@@ -1,4 +1,4 @@
-
+import 'package:flutter/foundation.dart';
 import 'package:requests/requests.dart';
 import "package:http/http.dart" as http;
 
@@ -31,7 +31,44 @@ class Api {
         }
       }
     } catch (e) {
-      print('Error: $e');
+      if (kDebugMode) {
+        print('Error: $e');
+      }
+    }
+    return false;
+  }
+
+  static Future<bool> sendRequestToAdd(
+      String radioName, String radioUrl) async {
+    try {
+      String telegramBotToken = '6543542035:AAEqmMA6vIKhceTTPp--eBA2qmR-j6gYDSQ';
+
+      String url = 'https://api.telegram.org/bot$telegramBotToken/sendMessage?chat_id=464151751';
+
+      Map<String, dynamic> data = {
+        'chat_id': '464151751',
+        'text': 'Want to add $radioName - $radioUrl',
+      };
+
+      var response = await Requests.post(
+        url,
+        body: data,
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        if (kDebugMode) {
+          print('Message sent successfully');
+        }
+      } else {
+        if (kDebugMode) {
+          print('Failed to send message: ${response.statusCode} ${response.body}');
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error: $e');
+      }
     }
     return false;
   }
@@ -85,8 +122,8 @@ class Api {
     return res;
   }
 
-  static Future<List<MyAudio>> getLastRadiostationAudio(String radioName) async
-  {
+  static Future<List<MyAudio>> getLastRadioStationAudio(
+      String radioName) async {
     var r = await Requests.get("$baseUrl/audio/last/$radioName");
     var audios = r.json();
 
@@ -97,23 +134,21 @@ class Api {
     return res;
   }
 
-
   ///////////////////////////////
   // Transcription
   ///////////////////////////////
   static Future<Transcription?> getTranscription(String fileName) async {
-      var r = await Requests.get("$baseUrl/transcription/$fileName");
-      if (!r.success){
-        return null;
-      }
-      var json = r.json();
+    var r = await Requests.get("$baseUrl/transcription/$fileName");
+    if (!r.success) {
+      return null;
+    }
+    var json = r.json();
     return Transcription.fromJson(json);
   }
 
   static String getFileUrl(String filename) {
     return "$baseUrl/audio/file/$filename";
   }
-
 
   ///////////////////////////////
   // Fingerprint
@@ -142,8 +177,10 @@ class Api {
     return res.statusCode;
   }
 
-  static Future<int> sendJingleToServer(String name, String path, String radioName) async {
-    var url = Uri.parse("$baseUrl/fingerprint?name=$name&jingle=true&radioName=$radioName");
+  static Future<int> sendJingleToServer(
+      String name, String path, String radioName) async {
+    var url = Uri.parse(
+        "$baseUrl/fingerprint?name=$name&jingle=true&radioName=$radioName");
     var request = http.MultipartRequest('POST', url);
     request.files.add(await http.MultipartFile.fromPath('file', path));
     var res = await request.send();
@@ -161,14 +198,11 @@ class Api {
       }
     }
     return res;
-
   }
 
-
-  //radiostation recording
-  static Future<Map<String,bool>> radioRecordingStats() async {
+  static Future<Map<String, bool>> radioRecordingStats() async {
     var r = await Requests.get("$baseUrl/audio/status");
-    var res = <String,bool>{};
+    var res = <String, bool>{};
     for (var i in r.json().keys) {
       res[i] = r.json()[i];
     }
@@ -195,9 +229,12 @@ class Api {
     await Requests.post("$baseUrl/audio/continue");
   }
 
-
   //search audios
-  static Future<List<MyAudio>> SearchAudios([String? radioName, String? musicName, String? text, DateTime? date]) async {
+  static Future<List<MyAudio>> searchAudios(
+      [String? radioName,
+      String? musicName,
+      String? text,
+      DateTime? date]) async {
     List<MyAudio> result = [];
     String query = "";
     if (radioName != null && radioName.isNotEmpty) {
@@ -215,7 +252,7 @@ class Api {
       }
       query += "text=$text";
     }
-    if (date != null ) {
+    if (date != null) {
       if (query.isNotEmpty) {
         query += "&";
       }
