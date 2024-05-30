@@ -108,8 +108,6 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
     // await audioPlayer.seek(newPosition);
   }
 
-
-
   void _onSliderChanged(double value) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {

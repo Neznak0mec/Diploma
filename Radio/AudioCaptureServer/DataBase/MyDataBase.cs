@@ -10,23 +10,12 @@ public sealed class MyDataBase : DbContext
 {
     public RadioCollection radioCollection { get; init; }
     public AudioCollection audioCollection { get; init; }
-
     public RecordTranscriptionCollection recordTranscriptionCollection { get; init; }
 
-    public DbSet<Audio> Audios { get; set; } = null!;
-    public DbSet<Radio> Radios { get; set; } = null!;
+    public DbSet<Audio> Audios { get; set; } 
+    public DbSet<Radio> Radios { get; set; } 
 
-    public void Reload<T>(T entity) where T : class
-    {
-        try
-        {
-            Entry(entity).Reload();
-        }
-        catch (Exception e)
-        {
-            Log.Error(e.Message);
-        }
-    }
+    private const string ConnectionString = "Host=89.110.91.74;Port=5432;Database=radio;Username=megaUserToNotBeHacked;Password=thisPasswordIsNeverGoingToBeHacked";
 
     public MyDataBase()
     {
@@ -35,12 +24,10 @@ public sealed class MyDataBase : DbContext
         radioCollection = new RadioCollection(this);
         audioCollection = new AudioCollection(this);
 
-
         NpgsqlConnection connection;
         try
         {
-            connection =
-                new NpgsqlConnection("Host=postgres;Port=5432;Database=radio;Username=megaUserToNotBeHacked;Password=password");
+            connection = new NpgsqlConnection(ConnectionString);
         }
         catch (Exception e)
         {
@@ -61,6 +48,16 @@ public sealed class MyDataBase : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-        optionsBuilder.UseNpgsql("Host=postgres;Port=5432;Database=radio;Username=megaUserToNotBeHacked;Password=password");
+        optionsBuilder.UseNpgsql(ConnectionString);
+    }
+
+    public IQueryable<Audio> GetAudios()
+    {
+        return Audios.AsNoTracking();
+    }
+
+    public IQueryable<Radio> GetRadios()
+    {
+        return Radios.AsNoTracking();
     }
 }

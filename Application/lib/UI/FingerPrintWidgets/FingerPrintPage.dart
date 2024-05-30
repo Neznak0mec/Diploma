@@ -1,4 +1,3 @@
-
 import 'package:abiba/DataClasses/Audio.dart';
 import 'package:flutter/material.dart';
 import '../../Api.dart';
@@ -148,14 +147,13 @@ class FingerPrintState extends State<FingerPrintPage> {
     List<FingerPrintWidget> widgets = [];
     for (var i in _fingerprints) {
       if (_jingles && (i.status == 20 || i.status == 21)) {
-        if (_radioName == "" ) {
+        if (_radioName == "") {
           widgets.add(FingerPrintWidget(i));
-        }
-        else if (i.radioName == _radioName) {
+        } else if (i.radioName == _radioName) {
           widgets.add(FingerPrintWidget(i));
         }
       }
-      else if (!_jingles){
+      if (!_jingles) {
         widgets.add(FingerPrintWidget(i));
       }
     }

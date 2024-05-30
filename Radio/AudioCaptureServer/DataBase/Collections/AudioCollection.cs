@@ -21,32 +21,29 @@ public class AudioCollection
 
     public List<Audio> GetAll(string? radioName = null,bool fingerptint = false)
     { 
-        connection.Reload(connection.Audios);
 
         if (fingerptint)
-            return connection.Audios.Where(x =>
+            return connection.GetAudios().Where(x =>
                 x.status == 10 ||
                 x.status == 11 ||
                 x.status == 20 ||
                 x.status == 21).ToList();
 
         if (radioName == null)
-            return connection.Audios.ToList();
-        return connection.Audios.Where(x => x.radioName == radioName).ToList();
+            return connection.GetAudios().ToList();
+        return connection.GetAudios().Where(x => x.radioName == radioName).ToList();
     }
 
 
     public Audio? GetLast(string radioName)
     {
-        connection.Reload(connection.Audios);
-        return connection.Audios.Where(x => x.radioName == radioName).MaxBy(x => x.endRecording);
+        return connection.GetAudios().Where(x => x.radioName == radioName).MaxBy(x => x.endRecording);
     }
 
     
     public Audio? GetByName(string fileName)
     {
-        connection.Reload(connection.Audios);
-        return connection.Audios.Where(x => x.fileName == fileName).ToList().FirstOrDefault();
+        return connection.GetAudios().Where(x => x.fileName == fileName).ToList().FirstOrDefault();
     }
     
 }

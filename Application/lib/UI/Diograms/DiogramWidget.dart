@@ -1,7 +1,11 @@
 import 'dart:math';
-
 import 'package:fl_chart/fl_chart.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../Api.dart';
 import '../../DataClasses/Transcription.dart';
@@ -18,6 +22,8 @@ class _TranscriptionAnalysisWidgetState
     extends State<TranscriptionAnalysisWidget> {
   List<Transcription> _transcriptions = [];
   int pieTouchedIndex = -1;
+  bool isTouched = false;
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -30,13 +36,25 @@ class _TranscriptionAnalysisWidgetState
 
     setState(() {
       _transcriptions = transcriptions;
+      _isLoading = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
+      appBar: AppBar(
+        title: Text('Transcription Analysis'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.picture_as_pdf),
+            onPressed: _generatePdf,
+          ),
+        ],
+      ),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Padding(
           padding: const EdgeInsets.all(16.0),
           child: SingleChildScrollView(
             child: Column(
@@ -109,67 +127,6 @@ class _TranscriptionAnalysisWidgetState
     return widgets;
   }
 
-  // BarChart transcriptionDurationsWidget() {
-  //   var durationData = _transcriptions
-  //       .map((t) =>
-  //       _DurationData(
-  //           t.radioName, t.endTime
-  //           .difference(t.startTime)
-  //           .inSeconds))
-  //       .toList();
-  //
-  //   final durationDataSummarized = <String, int>{};
-  //   for (var data in durationData) {
-  //     durationDataSummarized[data.radioName] =
-  //         (durationDataSummarized[data.radioName] ?? 0) + data.duration;
-  //
-  //   }
-  //
-  //   durationData = durationDataSummarized.entries
-  //       .map((e) => _DurationData(e.key, e.value))
-  //       .toList();
-  //
-  //
-  //   return BarChart(
-  //     BarChartData(
-  //       alignment: BarChartAlignment.spaceAround,
-  //       barGroups: durationData
-  //           .map(
-  //             (data) =>
-  //             BarChartGroupData(
-  //               x: durationData.indexOf(data),
-  //               barRods: [
-  //                 BarChartRodData(
-  //                     toY: data.duration.toDouble()/60, color: Colors.blue)
-  //               ],
-  //               showingTooltipIndicators: [0],
-  //             ),
-  //       )
-  //           .toList(),
-  //       titlesData: FlTitlesData(
-  //           leftTitles: const AxisTitles(
-  //             sideTitles: SideTitles(
-  //               showTitles: false,
-  //             ),
-  //           ),
-  //           bottomTitles: AxisTitles(
-  //             sideTitles: SideTitles(
-  //               showTitles: true,
-  //               getTitlesWidget: (double value, TitleMeta meta) {
-  //                 return SideTitleWidget(
-  //                     axisSide: meta.axisSide,
-  //                     space: 4,
-  //                     child: Text(durationData[value.toInt()].radioName,
-  //                         style: const TextStyle(
-  //                             fontSize: 16, fontWeight: FontWeight.bold)));
-  //               },
-  //               reservedSize: 22,
-  //             ),
-  //           )),
-  //     ),
-  //   );
-  // }
-
   AspectRatio transcriptionDurationsWidget() {
     var durationData = _transcriptions
         .map((t) => _DurationData(
@@ -188,9 +145,8 @@ class _TranscriptionAnalysisWidgetState
 
     List<PieChartSectionData> pieChartSectionDataList =
         durationData.map((data) {
-      const isTouched = false;
-      const double fontSize = isTouched ? 25 : 16;
-      const double radius = isTouched ? 60 : 50;
+      double fontSize = isTouched ? 25 : 16;
+      double radius = isTouched ? 60 : 50;
       final value = data.duration.toDouble();
 
       return PieChartSectionData(
@@ -198,7 +154,7 @@ class _TranscriptionAnalysisWidgetState
         value: value,
         title: data.radioName,
         radius: radius,
-        titleStyle: const TextStyle(
+        titleStyle: TextStyle(
             fontSize: fontSize,
             fontWeight: FontWeight.bold,
             color: Colors.black),
@@ -260,14 +216,20 @@ class _TranscriptionAnalysisWidgetState
                 showTitles: true,
                 getTitlesWidget: (double value, TitleMeta meta) {
                   return SideTitleWidget(
-                      axisSide: meta.axisSide,
-                      space: 4,
-                      child: Text(popularTracksData[value.toInt()].trackName,
-                          style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold)));
+                    axisSide: meta.axisSide,
+                    space: 4,
+                    child: Transform.rotate(
+                      angle: -pi / 4, // Rotate 45 degrees
+                      child: Text(
+                        popularTracksData[value.toInt()].trackName,
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  );
                 },
-                reservedSize: 22,
-              ),
+                reservedSize: 40, // Adjust this based on your needs
+              )
+
             )),
       ),
     );
@@ -377,6 +339,11 @@ class _TranscriptionAnalysisWidgetState
   getRandomColor() {
     return Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0);
   }
+
+  Future<void> _generatePdf() async {
+
+  }
+
 }
 
 class _DurationData {

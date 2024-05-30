@@ -51,6 +51,7 @@ class RecognizeMaster:
                     if i.file_name not in self.transcribing:
                         to_fingerprint.append(i)
                         self.transcribing.append(i.file_name)
+                        
                 await asyncio.create_task(self.fingerprint_songs(to_fingerprint))
 
             await asyncio.sleep(60)

@@ -19,8 +19,7 @@ public class RadioCollection
 
     public List<Radio> GetAll()
     {
-        _db.Reload(_db.Radios);
-        return _db.Radios.ToList();
+        return _db.GetRadios().ToList();
     }
 
     public Radio? Get(string? name = null, string? url = null)
