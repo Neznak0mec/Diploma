@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -142,8 +143,13 @@ class Api {
     if (!r.success) {
       return null;
     }
-    var json = r.json();
-    return Transcription.fromJson(json);
+    Transcription res = Transcription.fromJson(r.json());
+    for (int i = 0; i < res.segments.length; i++){
+      if (res.segments[i].trackName == "Not Found") {
+        res.segments[i].trackName = "Трек не найден";
+      }
+    }
+    return res;
   }
 
   static String getFileUrl(String filename) {

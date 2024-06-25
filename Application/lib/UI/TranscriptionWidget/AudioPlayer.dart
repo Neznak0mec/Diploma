@@ -83,21 +83,21 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
   Future<void> _play() async {
     localFilePath ??= await _downloadFile(widget.audioUrl, 'audio.mp3');
 
-    // await audioPlayer.play(DeviceFileSource(localFilePath!));
+    await audioPlayer.play(DeviceFileSource(localFilePath!));
     setState(() {
       isPlaying = true;
     });
   }
 
   Future<void> _pause() async {
-    // await audioPlayer.pause();
+    await audioPlayer.pause();
     setState(() {
       isPlaying = false;
     });
   }
 
   Future<void> _stop() async {
-    // await audioPlayer.stop();
+    await audioPlayer.stop();
     setState(() {
       isPlaying = false;
     });
@@ -105,7 +105,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
 
   Future<void> _seekToSecond(int second) async {
     Duration newPosition = Duration(seconds: second);
-    // await audioPlayer.seek(newPosition);
+    await audioPlayer.seek(newPosition);
   }
 
   void _onSliderChanged(double value) {

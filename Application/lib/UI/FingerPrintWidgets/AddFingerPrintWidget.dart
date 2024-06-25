@@ -1,5 +1,5 @@
 
-// import 'package:audioplayers/audioplayers.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
@@ -20,7 +20,7 @@ class AddFingerPrintWidget extends StatefulWidget {
 
 class _AddFingerPrintWidgetState extends State<AddFingerPrintWidget> {
   final TextEditingController _nameController = TextEditingController();
-  // final AudioPlayer audioPlayer = AudioPlayer();
+  final AudioPlayer audioPlayer = AudioPlayer();
   String? _filePath;
   String? _fileName;
   List<MyRadio> _radioList = [];
@@ -48,12 +48,12 @@ class _AddFingerPrintWidgetState extends State<AddFingerPrintWidget> {
 
   void playAudio() async {
     if (_filePath != null) {
-      // await audioPlayer.play(DeviceFileSource(_filePath!));
+      await audioPlayer.play(DeviceFileSource(_filePath!));
     }
   }
 
   void pauseAudio() async {
-    // await audioPlayer.pause();
+    await audioPlayer.pause();
   }
 
   void pickFile() async {

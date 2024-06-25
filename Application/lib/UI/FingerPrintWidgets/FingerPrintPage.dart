@@ -153,10 +153,11 @@ class FingerPrintState extends State<FingerPrintPage> {
           widgets.add(FingerPrintWidget(i));
         }
       }
-      if (!_jingles) {
+      if (!_jingles && i.status != 20 && i.status != 21) {
         widgets.add(FingerPrintWidget(i));
       }
     }
     return widgets;
   }
+
 }

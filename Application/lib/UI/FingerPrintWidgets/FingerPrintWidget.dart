@@ -1,7 +1,8 @@
 
-// import 'package:audioplayers/audioplayers.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
+import '../../Api.dart';
 import '../../DataClasses/Audio.dart';
 
 class FingerPrintWidget extends StatefulWidget {
@@ -14,14 +15,14 @@ class FingerPrintWidget extends StatefulWidget {
 }
 
 class _FingerPrintWidgetState extends State<FingerPrintWidget> {
-  // AudioPlayer audioPlayer = AudioPlayer();
+  AudioPlayer audioPlayer = AudioPlayer();
 
   void playAudio() async {
-    // await audioPlayer.play(UrlSource(Api.getFingerprintUrl(widget.audio.fileName)));
+    await audioPlayer.play(UrlSource(Api.getFingerprintUrl(widget.audio.fileName)));
   }
 
   void pauseAudio() async {
-    // await audioPlayer.pause();
+    await audioPlayer.pause();
   }
 
   @override
