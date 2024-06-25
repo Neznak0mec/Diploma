@@ -43,12 +43,12 @@ class Api {
   static Future<bool> sendRequestToAdd(
       String radioName, String radioUrl) async {
     try {
-      String telegramBotToken = '6543542035:AAEqmMA6vIKhceTTPp--eBA2qmR-j6gYDSQ';
+      String telegramBotToken = '-';
 
       String url = 'https://api.telegram.org/bot$telegramBotToken/sendMessage';
 
       Map<String, dynamic> data = {
-        'chat_id': '464151751',
+        'chat_id': '0',
         'text': 'Want to add $radioName - $radioUrl',
       };
 
